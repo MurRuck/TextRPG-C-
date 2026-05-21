@@ -1,0 +1,46 @@
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Plugin generated folders
+Plugins/**/Binaries/
+Plugins/**/Intermediate/
+Plugins/**/DerivedDataCache/
+Plugins/**/Saved/
+
+# IDE / Editor
+.vs/
+.vscode/
+.idea/
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.VC.opendb
+*.sln.DotSettings.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs / temp
+*.log
+*.tmp
+*.pid
+
+# Packaging / cooked builds
+Saved/StagedBuilds/
+Saved/Cooked/
+Saved/Temp/
+Saved/Collections/
+Saved/Crashes/
+Saved/Logs/
+Saved/Autosaves/
+Saved/Backup/
+
+# Optional local config
+Saved/Config/
