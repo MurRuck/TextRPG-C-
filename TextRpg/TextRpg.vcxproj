@@ -123,7 +123,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="PlayerCharacter.cpp" />
     <ClCompile Include="TextRpg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PlayerCharacter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
