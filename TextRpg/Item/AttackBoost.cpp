@@ -8,6 +8,10 @@ std::string AttackBoost::getName() const {
 	return this->name;
 }
 
+int AttackBoost::getPrice() const {
+	return this->price;
+}
+
 void AttackBoost::use(PlayerCharacter* playerCharacter) {
 	playerCharacter->SetAttack(playerCharacter->GetAttack() + attackIncrease);
 }

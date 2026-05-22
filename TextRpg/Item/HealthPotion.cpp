@@ -9,6 +9,10 @@ std::string HealthPotion::getName() const {
 	return this->name;
 }
 
+int HealthPotion::getPrice() const {
+	return this->price;
+}
+
 void HealthPotion::use(PlayerCharacter* playerCharacter) {
 	playerCharacter->SetHP(std::min(playerCharacter->GetMaxHP(), playerCharacter->GetHP() + healthRestore));
 }
