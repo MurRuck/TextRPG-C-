@@ -76,6 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -102,6 +103,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -203,7 +205,8 @@
     <ClCompile Include="GameManager\Gamemode\Gamemode.cpp" />
     <ClCompile Include="GameManager\LoggingManager\LoggingManager.cpp" />
     <ClCompile Include="GameStart.cpp" />
-    <ClCompile Include="Item\Item.cpp" />
+    <ClCompile Include="Item\AttackBoost.cpp" />
+    <ClCompile Include="Item\HealthPotion.cpp" />
     <ClCompile Include="Map\Battle\Battle.cpp" />
     <ClCompile Include="Map\Shop\Shop.cpp" />
     <ClCompile Include="TextRpg.cpp" />
@@ -214,6 +217,8 @@
     <ClInclude Include="GameManager\Gamemode\Gamemode.h" />
     <ClInclude Include="GameManager\LoggingManager\LoggingManager.h" />
     <ClInclude Include="GameStart.h" />
+    <ClInclude Include="Item\AttackBoost.h" />
+    <ClInclude Include="Item\HealthPotion.h" />
     <ClInclude Include="Item\Item.h" />
     <ClInclude Include="Map\Battle\Battle.h" />
     <ClInclude Include="Map\Shop\Shop.h" />
