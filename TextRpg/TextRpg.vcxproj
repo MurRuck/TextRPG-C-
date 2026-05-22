@@ -216,7 +216,6 @@
     <ClInclude Include="GameStart.h" />
     <ClInclude Include="Item\Item.h" />
     <ClInclude Include="Map\Battle\Battle.h" />
-    <ClInclude Include="Map\MapBase.h" />
     <ClInclude Include="Map\Shop\Shop.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

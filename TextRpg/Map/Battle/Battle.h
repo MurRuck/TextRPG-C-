@@ -23,7 +23,4 @@ private:
 private:
     Player* player = nullptr;
     Monster* monster = nullptr;
-
-
-
 };
