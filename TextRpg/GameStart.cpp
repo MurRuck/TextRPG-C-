@@ -8,9 +8,4 @@ void GameStart()
     Gamemode Gamemode;
 
     std::cout << "start" << std::endl;
-
-    while (true)
-    {
-        Gamemode.UIRenderer();
-    }
 }
