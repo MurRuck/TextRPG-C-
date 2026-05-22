@@ -63,9 +63,29 @@ bool PlayerCharacter::IsDead() const
     return hp <= 0;
 }
 
+int PlayerCharacter::GetHP() const
+{
+    return hp;
+}
+
+int PlayerCharacter::GetMaxHP() const
+{
+    return maxHP;
+}
+
 int PlayerCharacter::GetAttack() const
 {
     return attack;
+}
+
+void PlayerCharacter::SetHP(int amount)
+{
+    hp = amount;
+}
+
+void PlayerCharacter::SetAttack(int amount)
+{
+    attack = amount;
 }
 
 
