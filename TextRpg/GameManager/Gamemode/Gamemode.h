@@ -33,19 +33,10 @@ public:
     // state setter
     void SetPlayerState(PlayerState newState) { currentState = newState; }
 
-    // UI
-    void InitUI();
-    void UIRenderer();
-    void HandleInput();
-    void ClearCLI() { std::system("cls"); }
 
 private:
-    MapBase* GetCurrentMapState();
 
     std::unique_ptr<PlayerCharacter> player;
     PlayerState currentState = PlayerState::Create;
-
-    std::unique_ptr<Create> createState;
-    std::unique_ptr<Battle> battleState;
-    std::unique_ptr<Shop> shopState;
 };
+
