@@ -5,6 +5,9 @@
 #include "../../Entity/Character/PlayerCharacter.h"
 
 class MapBase;
+class Create;
+class Battle;
+class Shop;
 
 enum class PlayerState { Create, Battle, Shop };
 
@@ -25,7 +28,7 @@ public:
     }
 
     // state getter
-    PlayerState GetPlayerState() const { return currentState; }
+    PlayerState GetPlayerState() const;
 
     // state setter
     void SetPlayerState(PlayerState newState) { currentState = newState; }
@@ -37,6 +40,12 @@ public:
     void ClearCLI() { std::system("cls"); }
 
 private:
+    MapBase* GetCurrentMapState();
+
     std::unique_ptr<PlayerCharacter> player;
     PlayerState currentState = PlayerState::Create;
+
+    std::unique_ptr<Create> createState;
+    std::unique_ptr<Battle> battleState;
+    std::unique_ptr<Shop> shopState;
 };

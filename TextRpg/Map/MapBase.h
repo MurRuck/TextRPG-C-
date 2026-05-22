@@ -4,5 +4,8 @@
 
 class MapBase
 {
-    ~MapBase() = default;
+public:
+    virtual ~MapBase() = default;
+    virtual void Render(Gamemode& gamemode) = 0;
+    virtual void HandleInput(Gamemode& gamemode) = 0;
 };
