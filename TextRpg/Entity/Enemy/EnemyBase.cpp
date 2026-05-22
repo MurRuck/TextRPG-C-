@@ -10,8 +10,8 @@ EnemyBase::EnemyBase(string name, int level, float statMultiplier)
 	this->name = name;
 	hp = ((rand() % (level * 10 + 1)) + level * 20) * statMultiplier;
 	attack = ((rand() % (level * 5 + 1)) + level * 5) * statMultiplier;
-	exp = level * 10; // 경험치량은 임시
-	gold = level * 10; // 골드도 임시
+	exp = level * 25;
+	gold = level * 10;
 }
 
 string EnemyBase::GetName() const
