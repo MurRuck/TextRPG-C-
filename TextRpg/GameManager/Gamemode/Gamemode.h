@@ -5,9 +5,6 @@
 #include "../../Entity/Character/PlayerCharacter.h"
 
 class MapBase;
-class Create;
-class Battle;
-class Shop;
 
 enum class PlayerState { Create, Battle, Shop };
 
