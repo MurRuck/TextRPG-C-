@@ -19,7 +19,12 @@ public:
     
     bool IsDead() const;
     
+    int GetHP() const;
+    int GetMaxHP() const;
     int GetAttack() const;
+    
+    void SetHP(int amount);
+    void SetAttack(int amount);
 private:
     std::string name;
     int maxHP = 200;
