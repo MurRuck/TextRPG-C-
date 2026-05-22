@@ -2,6 +2,7 @@
 
 #pragma once
 #include <string>
+#include "../Character/PlayerCharacter.h"
 
 class EnemyBase
 {
@@ -25,4 +26,5 @@ public:
 	bool IsAlive() const;
 
 	void PrintInfo() const;
+	void OnDeath(PlayerCharacter* player);
 };

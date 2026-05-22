@@ -56,3 +56,9 @@ void EnemyBase::PrintInfo() const
 	cout << "HP: " << hp << endl;
 	cout << "ATK: " << attack << endl;
 }
+
+void EnemyBase::OnDeath(PlayerCharacter* player)
+{
+	player->GainExp(exp);
+	player->GainGold(gold);
+}
