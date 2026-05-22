@@ -3,7 +3,7 @@
 
 LoggingManager::LoggingManager()
 {
-    
+    Initialize();
 }
 
 LoggingManager::~LoggingManager()
@@ -31,37 +31,26 @@ bool LoggingManager::Initialize(const std::string& logDirectory)
     return logFile.is_open();
 }
 
-template <typename T>
-void LoggingManager::Add(LogHeader headText, T data)
-{
-    if (!logFile.is_open())
-    {
-        return;
-    }
-    
-    std::string headTextToString;
-    if (headText == LogHeader::Error)
-    {
-        headTextToString = "Error";
-    }
-    if (headText == LogHeader::Warning)
-    {
-        headTextToString = "Warning";
-    }
-    if (headText == LogHeader::Info)
-    {
-        headTextToString = "Info";
-    }
-    
-    std::string logDataString = std::to_string(data);
-    std::string lineForLogging = "[" + headTextToString+ "] " + logDataString;
-    
-    logFile << lineForLogging << std::endl;
-    logFile.flush();
-}
 
 
 void LoggingManager::ViewLog() const
 {
     
+}
+
+std::string LoggingManager::GetTimestamp() const
+{
+    auto now = std::chrono::system_clock::now();
+    auto timeT = std::chrono::system_clock::to_time_t(now);
+
+    std::tm localTime{};
+#ifdef _WIN32
+    localtime_s(&localTime, &timeT);
+#else
+    localtime_r(&timeT, &localTime);
+#endif
+
+    std::ostringstream oss;
+    oss << std::put_time(&localTime, "%Y%m%d_%H%M%S");
+    return oss.str();
 }
