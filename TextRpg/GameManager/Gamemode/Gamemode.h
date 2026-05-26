@@ -16,7 +16,7 @@ public:
 
 
     // player getter
-    const PlayerCharacter* GetPlayerCharacter() const { return player.get(); }
+    const PlayerCharacter& GetPlayerCharacter() const { return *player; }
 
     // player setter
     void SetPlayerCharceter(std::unique_ptr<PlayerCharacter> newCharacter)
