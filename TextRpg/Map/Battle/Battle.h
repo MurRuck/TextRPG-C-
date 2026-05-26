@@ -27,8 +27,6 @@ private:
     int buffTurn = 0;
     LoggingManager logger;
     std::string lastLog;  
-
-    std::string lastLog;
     std::string lastLog2;
     std::string lastLog3;
 
