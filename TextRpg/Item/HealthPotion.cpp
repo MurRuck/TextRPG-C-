@@ -2,7 +2,7 @@
 #include "HealthPotion.h"
 #include "../Entity/Character/PlayerCharacter.h"
 
-#include <string.h>
+#include <string>
 #include <algorithm>
 
 std::string HealthPotion::getName() const {
