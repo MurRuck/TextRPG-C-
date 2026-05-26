@@ -13,8 +13,7 @@
 struct ShopEntry
 {
     std::function<std::unique_ptr<Item>()> factory; // 아이템 생성 함수
-    int                                    stock;   // 남은 수량 (최대 3)
-};
+    int                                    stock;   // 남은 수량 
 
 class Shop
 {
@@ -30,8 +29,12 @@ public:
     void OpenShop(Gamemode& gamemode);
 
 private:
-    std::vector<ShopEntry> stock_; // 재고 목록 (아이템별 최대 3개)
+    std::vector<ShopEntry> stock_; // 재고 목록 
 
     void PrintStock(const PlayerCharacter* player) const;
     void BuyItem(int index, Gamemode& gamemode);
+    void PrintInventoryForSell(const PlayerCharacter* player) const;
+    void SellItem(int invIndex, Gamemode& gamemode);
+    void OpenSellMenu(Gamemode& gamemode);
+
 };
