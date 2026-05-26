@@ -9,35 +9,66 @@ using namespace std;
 // =========================
 void BattleLoop::DisplayUI(const std::string& log) const
 {
-    system("cls");  // 콘솔 초기화 (Windows 기준)
+    system("cls");
 
-    cout << "=====================================\n";
-    cout << "  [ 플레이어 ]        [ 몬스터 ]\n";
-    cout << "  HP  : " << player->GetHP() << "/" << player->GetMaxHP();
+    cout << "==============================================\n";
+    cout << "           TEXT RPG BATTLE\n";
+    cout << "==============================================\n";
+
+    // =========================
+    // HEADER
+    // =========================
+    //cout << " [ " << player->GetName() << " ]"
+    //    << "                     "
+    //    << "[ " << (monster ? monster->GetName() : "None") << " ]\n";
+
+    //cout << "----------------------------------------------\n";
+
+    // =========================
+    // HP / ATK
+    // =========================
+    cout << " HP  : " << player->GetHP()
+        << " / " << player->GetMaxHP()
+        << "              ";
 
     if (monster)
-        cout << "         HP  : " << monster->GetHp() << "\n";
+        cout << "HP  : " << monster->GetHp() << "\n";
     else
-        cout << "\n";
+        cout << "HP  : -\n";
 
-    cout << "  ATK : " << player->GetAttack();
+    cout << " ATK : " << player->GetAttack()
+        << "                      ";
 
     if (monster)
-        cout << "              ATK : " << monster->GetAttack() << "\n";
+        cout << "ATK : " << monster->GetAttack() << "\n";
     else
-        cout << "\n";
+        cout << "ATK : -\n";
 
+    cout << "----------------------------------------------\n";
+
+    // =========================
+    // BUFF
+    // =========================
+    cout << " BUFF : ";
     if (buffTurn > 0)
-        cout << "  버프 : " << buffTurn << "턴 남음\n";
+        cout << buffTurn << " turn(s)\n";
     else
-        cout << "  버프 : 없음\n";
+        cout << "none\n";
 
-    cout << "=====================================\n";
-    cout << "  [로그]\n";
-    cout << "  > " << log << "\n";
-    cout << "=====================================\n";
+    cout << "==============================================\n";
+
+    // =========================
+    // LOG (3줄)
+    // =========================
+    cout << " LOG\n";
+    cout << "----------------------------------------------\n";
+
+    cout << " > " << log << "\n";
+    cout << " > " << lastLog2 << "\n";
+    cout << " > " << lastLog3 << "\n";
+
+    cout << "==============================================\n";
 }
-
 // =========================
 // 전투 시작
 // =========================
