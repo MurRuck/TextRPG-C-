@@ -39,7 +39,10 @@
     <ClCompile Include="Map\Shop\Shop.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Item\Item.cpp">
+    <ClCompile Include="Item\AttackBoost.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Item\HealthPotion.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,13 +65,16 @@
     <ClInclude Include="Map\Battle\Battle.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Map\MapBase.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Map\Shop\Shop.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Item\Item.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Item\AttackBoost.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Item\HealthPotion.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
