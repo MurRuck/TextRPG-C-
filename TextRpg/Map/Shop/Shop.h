@@ -3,6 +3,7 @@
 #include <memory>
 #include <functional>
 #include "../../GameManager/Gamemode/Gamemode.h"
+#include "../../GameManager/LoggingManager/LoggingManager.h"
 #include "../../Item/Item.h"
 
 // ────────────────────────────────────────────
@@ -13,8 +14,9 @@
 struct ShopEntry
 {
     std::function<std::unique_ptr<Item>()> factory; // 아이템 생성 함수
-    int                                    stock;   // 남은 수량 
-
+    int stock;   // 남은 수량 
+};
+    
 class Shop
 {
 public:
@@ -29,13 +31,12 @@ public:
     void OpenShop(Gamemode& gamemode);
 
 private:
+    LoggingManager logManager;
     std::vector<ShopEntry> stock_; // 재고 목록 
-
     void PrintStock(const PlayerCharacter* player) const;
     void BuyItem(int index, Gamemode& gamemode);
     void PrintInventoryForSell(const PlayerCharacter* player) const;
     void SellItem(int invIndex, Gamemode& gamemode);
     void OpenSellMenu(Gamemode& gamemode);
-
 };
 

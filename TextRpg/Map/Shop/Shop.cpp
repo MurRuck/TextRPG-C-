@@ -3,11 +3,10 @@
 #include <iostream>
 #include <iomanip>
 #include <limits>
-#include "../../Logging/LoggingManager.h"
-#include "../../Entity/Item/HealthPotion.h"
-#include "../../Entity/Item/AttackBoost.h"
 
-
+#include "../../GameManager/LoggingManager/LoggingManager.h"
+#include "../../Item/HealthPotion.h"
+#include "../../Item/AttackBoost.h"
 
 
 static void ClearInput()
@@ -112,15 +111,17 @@ void Shop::BuyItem(int index, Gamemode& gamemode)
 
     // 구매 처리: 골드 차감 + 인벤토리 즉시 추가 + 재고 감소
     std::string boughtName = temp->getName();
-
-    player->gold -= price;
-    player->inventory.push_back(std::move(temp));
+    
+    // player->decreaseGold(price);
+    
+    player->GainGold(-price);
+    player->AddItem(move(temp));
     entry.stock--;
 
     logManager.Add(LogHeader::Info, "BuyItem:", boughtName + " (-" + std::to_string(price) + "G)");
    
     std::cout << "  [" << boughtName << "] purchased! (-" << price << "G)\n";
-    std::cout << "  Gold remaining: " << player->gold << "G\n";
+    std::cout << "  Gold remaining: " << player->GetGold() << "G\n";
 }
 
 // ────────────────────────────────────────────
@@ -135,7 +136,24 @@ void Shop::PrintInventoryForSell(const PlayerCharacter* player) const
         return;
     }
 
-    std::cout << "  Gold: " << player->gold << "G\n";
+    std::cout << "  Gold: " << player->GetGold() << "G\n";
+    
+    // inventory = vector > 배열
+    // for (int i = 0; i < inventory.size(); i++)
+    // {
+    //     if (inventory.size() <= 0)
+    //     {
+    //         std::cout << "  Inventory is empty.\n";
+    //         std::cout << "  0. Back\n";
+    //     }
+    //     else
+    //     {
+    //         // 1. slime ball
+    //         // 2. axe
+    //         std::cout << i << ". " << inventory[i] << std::endl;
+    //     }
+    // }
+    
 
     if (player->inventory.empty())
     {
@@ -179,7 +197,7 @@ void Shop::SellItem(int invIndex, Gamemode& gamemode)
     std::string name = item->getName();
 
     // 골드 지급
-    player->gold += sellPrice;
+    player->GainGold(sellPrice);
 
     // 인벤토리에서 제거 (unique_ptr 파괴)
     player->inventory.erase(player->inventory.begin() + invIndex);
@@ -187,7 +205,7 @@ void Shop::SellItem(int invIndex, Gamemode& gamemode)
     logManager.Add(LogHeader::Info, "SellItem:", name + " (+" + std::to_string(sellPrice) + "G)");
     
     std::cout << "  [" << name << "] sold! (+" << sellPrice << "G)\n";
-    std::cout << "  Gold remaining: " << player->gold << "G\n";
+    std::cout << "  Gold remaining: " << player->GetGold() << "G\n";
 
 }
 
