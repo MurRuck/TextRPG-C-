@@ -47,7 +47,7 @@ void EnemyBase::TakeDamage(int damage)
 
 bool EnemyBase::IsAlive() const
 {
-	return hp < 0;
+	return hp > 0;
 }
 
 void EnemyBase::PrintInfo() const
@@ -55,4 +55,10 @@ void EnemyBase::PrintInfo() const
 	cout << "[ " << name << " ]" << endl;
 	cout << "HP: " << hp << endl;
 	cout << "ATK: " << attack << endl;
+}
+
+void EnemyBase::OnDeath(PlayerCharacter* player)
+{
+	player->GainEXP(exp);
+	player->GainGold(gold);
 }

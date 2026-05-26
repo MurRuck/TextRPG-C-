@@ -201,6 +201,7 @@
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Entity\Enemy\Boss.cpp" />
     <ClCompile Include="Entity\Enemy\EnemyBase.cpp" />
     <ClCompile Include="GameManager\Gamemode\Gamemode.cpp" />
     <ClCompile Include="GameManager\LoggingManager\LoggingManager.cpp" />
@@ -213,6 +214,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity\Character\PlayerCharacter.h" />
+    <ClInclude Include="Entity\Enemy\Boss.h" />
     <ClInclude Include="Entity\Enemy\EnemyBase.h" />
     <ClInclude Include="GameManager\Gamemode\Gamemode.h" />
     <ClInclude Include="GameManager\LoggingManager\LoggingManager.h" />

@@ -1,46 +1,71 @@
 ﻿#include "Battle.h"
 #include <iostream>
+#include <cstdlib>
+
+using namespace std;
 
 // =========================
-// 임시 테스트용 구조 (나중에 삭제)
+// UI 출력
 // =========================
-class Player {
-public:
-    int hp;
-    int atk;
-};
+void BattleLoop::DisplayUI(const std::string& log) const
+{
+    system("cls");  // 콘솔 초기화 (Windows 기준)
 
-class Monster {
-public:
-    int hp;
-    int atk;
-};
+    cout << "=====================================\n";
+    cout << "  [ 플레이어 ]        [ 몬스터 ]\n";
+    cout << "  HP  : " << player->GetHP() << "/" << player->GetMaxHP();
+
+    if (monster)
+        cout << "         HP  : " << monster->GetHp() << "\n";
+    else
+        cout << "\n";
+
+    cout << "  ATK : " << player->GetAttack();
+
+    if (monster)
+        cout << "              ATK : " << monster->GetAttack() << "\n";
+    else
+        cout << "\n";
+
+    if (buffTurn > 0)
+        cout << "  버프 : " << buffTurn << "턴 남음\n";
+    else
+        cout << "  버프 : 없음\n";
+
+    cout << "=====================================\n";
+    cout << "  [로그]\n";
+    cout << "  > " << log << "\n";
+    cout << "=====================================\n";
+}
 
 // =========================
 // 전투 시작
 // =========================
-void BattleLoop::StartBattle(Player* player)
+void BattleLoop::StartBattle(PlayerCharacter* player)
 {
     this->player = player;
 
-    CreateMonster();
+    if (!player)
+        return;
 
-    std::cout << "전투 시작!\n";
+    logger.Add(LogHeader::Info, "Battle Start", "Player entered battle");
+
+    CreateMonster();
 
     while (true)
     {
         PlayerTurn();
-
         if (CheckBattleEnd())
             break;
 
         MonsterTurn();
-
         if (CheckBattleEnd())
             break;
     }
 
     GiveReward();
+
+    logger.Add(LogHeader::Info, "Battle End", "Battle finished");
 }
 
 // =========================
@@ -48,12 +73,31 @@ void BattleLoop::StartBattle(Player* player)
 // =========================
 void BattleLoop::CreateMonster()
 {
-    monster = new Monster();
+    int type = rand() % 3;// 임시
 
-    monster->hp = 50;
-    monster->atk = 10;
+    if (type == 0)
+    {
+        monster = std::make_unique<EnemyBase>("Slime", 1);
+    }
+    else if (type == 1)
+    {
+        monster = std::make_unique<EnemyBase>("Goblin", 2);
+    }
+    else
+    {
+        monster = std::make_unique<EnemyBase>("Orc", 3);
+    }
 
-    std::cout << "몬스터 등장! HP: " << monster->hp << "\n";
+    DisplayUI("몬스터 등장!");
+    logger.Add(LogHeader::Info, "Monster Spawn", monster->GetName());
+}
+
+// =========================
+// 인벤토리 체크
+// =========================
+bool BattleLoop::HasItem() const
+{
+    return true;  //추가예정
 }
 
 // =========================
@@ -61,11 +105,53 @@ void BattleLoop::CreateMonster()
 // =========================
 void BattleLoop::PlayerTurn()
 {
-    std::cout << "플레이어 공격!\n";
+    float hpRatio = (float)player->GetHP() / player->GetMaxHP();
 
-    monster->hp -= player->atk;
+    if (buffTurn > 0)
+    {
+        buffTurn--;
+        if (buffTurn == 0)
+        {
+            player->SetAttack(player->GetAttack() - 10);
+            DisplayUI("버프 종료!");
+            logger.Add(LogHeader::Warning, "Buff End", "Attack buff removed");
+        }
+    }
 
-    std::cout << "몬스터 HP: " << monster->hp << "\n";
+    if (hpRatio <= 0.3f)
+    {
+        if (HasItem())
+        {
+            player->UseItem(0);
+            DisplayUI("HP 포션 사용!");
+            logger.Add(LogHeader::Info, "Potion Use", "HP critical - used item");
+        }
+        else
+        {
+            Attack();
+        }
+        return;
+    }
+
+    if (hpRatio >= 0.7f)
+    {
+        if (buffTurn == 0)
+            UseBuff();
+        else
+            Attack();
+        return;
+    }
+
+    if (rand() % 2 == 0 || !HasItem())
+    {
+        Attack();
+    }
+    else
+    {
+        player->UseItem(0);
+        DisplayUI("포션 사용!");
+        logger.Add(LogHeader::Info, "Potion Use", "Random action - used potion");
+    }
 }
 
 // =========================
@@ -73,30 +159,30 @@ void BattleLoop::PlayerTurn()
 // =========================
 void BattleLoop::MonsterTurn()
 {
-    std::cout << "몬스터 공격!\n";
+    int damage = monster->GetAttack();
+    player->TakeDamage(damage);
 
-    player->hp -= monster->atk;
-
-    std::cout << "플레이어 HP: " << player->hp << "\n";
+    DisplayUI(monster->GetName() + " 공격! " + to_string(damage) + " 데미지");
+    logger.Add(LogHeader::Warning, "Monster Attack", damage);
 }
 
 // =========================
-// 종료 체크
+// 전투 종료 체크
 // =========================
-bool BattleLoop::CheckBattleEnd()
+bool BattleLoop::CheckBattleEnd() const
 {
-    if (monster == nullptr || player == nullptr)
+    if (!player || !monster)
         return true;
 
-    if (monster->hp <= 0)
+    if (!monster->IsAlive())
     {
-        std::cout << "승리!\n";
+        DisplayUI("승리!");
         return true;
     }
 
-    if (player->hp <= 0)
+    if (player->IsDead())
     {
-        std::cout << "패배...\n";
+        DisplayUI("패배...");
         return true;
     }
 
@@ -104,15 +190,47 @@ bool BattleLoop::CheckBattleEnd()
 }
 
 // =========================
-// 보상 + 메모리 정리
+// 보상 지급
 // =========================
 void BattleLoop::GiveReward()
 {
-    if (player && player->hp > 0)
+    if (!player)
+        return;
+
+    if (!player->IsDead())
     {
-        std::cout << "보상 획득!\n";
+        player->GainEXP(monster->GetExp());
+        player->GainGold(monster->GetGold());
+        logger.Add(LogHeader::Info, "Reward", "EXP & Gold granted");
+        DisplayUI("보상 획득!");
     }
 
-    delete monster;
-    monster = nullptr;
+    monster.reset();
+}
+
+// =========================
+// 공격
+// =========================
+void BattleLoop::Attack()
+{
+    if (!monster)
+        return;
+
+    int damage = player->GetAttack();
+    monster->TakeDamage(damage);
+
+    DisplayUI("플레이어 공격! " + to_string(damage) + " 데미지");
+    logger.Add(LogHeader::Info, "Player Attack", damage);
+}
+
+// =========================
+// 버프
+// =========================
+void BattleLoop::UseBuff()
+{
+    player->SetAttack(player->GetAttack() + 10);
+    buffTurn = 3;
+
+    DisplayUI("공격력 버프 사용! ATK +" + to_string(10) + " (3턴)");
+    logger.Add(LogHeader::Warning, "Buff Used", "Attack +10 for 3 turns");
 }
