@@ -3,7 +3,7 @@
 #include <memory>
 #include <functional>
 #include "../../GameManager/Gamemode/Gamemode.h"
-#include "../../Entity/Item/Item.h"
+#include "../../Item/Item.h"
 
 // ────────────────────────────────────────────
 //  상점 재고 항목
@@ -38,3 +38,4 @@ private:
     void OpenSellMenu(Gamemode& gamemode);
 
 };
+

@@ -32,6 +32,9 @@ Release/
 *.lib
 *.exp
 
+*.vcxproj
+*.vcxproj.filters
+
 # OS
 .DS_Store
 Thumbs.db

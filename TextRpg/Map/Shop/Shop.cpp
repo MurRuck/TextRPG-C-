@@ -9,6 +9,7 @@
 
 
 
+
 static void ClearInput()
 {
     std::cin.clear();
@@ -65,7 +66,7 @@ void Shop::PrintStock(const PlayerCharacter* player) const
     std::cout << "*  S H O P  *\n";
    
     if (player)
-        std::cout << "  Gold: " << player->gold << "G\n";
+        std::cout << "  Gold: " << player->GetGold() << "G\n";
     
     for (int i = 0; i < (int)stock_.size(); ++i)
     {
@@ -103,7 +104,7 @@ void Shop::BuyItem(int index, Gamemode& gamemode)
     }
             
     // 골드 부족 확인
-    if (player->gold < price)
+    if (player->GetGold() < price)
     {
         std::cout << "  Not enough gold!  \n";
         return;
@@ -187,6 +188,7 @@ void Shop::SellItem(int invIndex, Gamemode& gamemode)
     
     std::cout << "  [" << name << "] sold! (+" << sellPrice << "G)\n";
     std::cout << "  Gold remaining: " << player->gold << "G\n";
+
 }
 
 // ────────────────────────────────────────────
@@ -225,7 +227,7 @@ void Shop::OpenShop(Gamemode& gamemode)
 {
     while (true)
     {
-        PrintStock(gamemode.GetPlayerCharacter());
+        PrintStock(&gamemode.GetPlayerCharacter());
 
         int input;
         if (!(std::cin >> input))

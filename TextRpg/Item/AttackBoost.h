@@ -14,8 +14,8 @@ private:
 public:
 	AttackBoost() {}
 
-	std::string getName() const override {}
-	int getPrice() const override {}
+	std::string getName() const override;
+	int getPrice() const override;
 
-	void use(PlayerCharacter* playerCharacter) override {}
+	void use(PlayerCharacter* playerCharacter) override;
 };
