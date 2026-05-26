@@ -4,8 +4,8 @@
 #include <iomanip>
 #include <limits>
 
-#include "../../Entity/Item/HealthPotion.h"
-#include "../../Entity/Item/AttackBoost.h"
+#include "../../Item/HealthPotion.h"
+#include "../../Item/AttackBoost.h"
 
 static void ClearInput()
 {
@@ -56,7 +56,7 @@ void Shop::PrintStock(const PlayerCharacter* player) const
     std::cout << "*  S H O P  *\n";
    
     if (player)
-        std::cout << "  Gold: " << player->gold << "G\n";
+        std::cout << "  Gold: " << player->GetGold() << "G\n";
     
     for (int i = 0; i < (int)stock_.size(); ++i)
     {
@@ -89,24 +89,25 @@ void Shop::BuyItem(int index, Gamemode& gamemode)
     // 품절 확인
     if (entry.stock <= 0)
     {
-        std::cout << "  " << getName() << " is sold out.\n";
+        std::cout << "  " << temp->getName() << " is sold out.\n";
         return;
     }
             
     // 골드 부족 확인
-    if (player->gold < price)
+    if (player->GetGold() < price)
     {
         std::cout << "  Not enough gold!  \n";
         return;
     }
 
     // 구매 처리: 골드 차감 + 인벤토리 즉시 추가 + 재고 감소
-    player->gold -= price;
-    player->inventory.push_back(std::move(temp));
+    const std::string itemName = temp->getName();
+    player->BuyItem(price);
+    player->AddItem(std::move(temp));
     entry.stock--;
 
     std::cout << "  [" << itemName << "] purchased! (-" << price << "G)\n";
-    std::cout << "  Gold remaining: " << player->gold << "G\n";
+    std::cout << "  Gold remaining: " << player->GetGold() << "G\n";
 }
 
 // ────────────────────────────────────────────
@@ -117,7 +118,7 @@ void Shop::OpenShop(Gamemode& gamemode)
 {
     while (true)
     {
-        PrintStock(gamemode.GetPlayerCharacter());
+        PrintStock(&gamemode.GetPlayerCharacter());
 
         int input;
         std::cin >> input;
