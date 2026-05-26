@@ -3,11 +3,13 @@
 #pragma once
 #include <string>
 #include "../Character/PlayerCharacter.h"
+#include "DropItem.h"
 
 class EnemyBase
 {
 private:
 	std::string name;
+	std::string dropItemName;
 	int hp;
 	int attack;
 	int exp;

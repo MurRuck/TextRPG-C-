@@ -12,6 +12,13 @@ EnemyBase::EnemyBase(string name, int level, float statMultiplier)
 	attack = ((rand() % (level * 5 + 1)) + level * 5) * statMultiplier;
 	exp = level * 25;
 	gold = level * 10;
+
+	if (name == "Slime")
+		dropItemName = "슬라임의 방울";
+	else if (name == "Goblin")
+		dropItemName = "고블린 이빨";
+	else if (name == "Orc")
+		dropItemName = "오크 가죽";
 }
 
 string EnemyBase::GetName() const
@@ -61,4 +68,5 @@ void EnemyBase::OnDeath(PlayerCharacter* player)
 {
 	player->GainEXP(exp);
 	player->GainGold(gold);
+	player->AddItem(std::make_unique<DropItem>(dropItemName));
 }
