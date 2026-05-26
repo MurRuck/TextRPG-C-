@@ -33,7 +33,6 @@ public:
 
 
 private:
-
     std::unique_ptr<PlayerCharacter> player;
     PlayerState currentState = PlayerState::Create;
 };
