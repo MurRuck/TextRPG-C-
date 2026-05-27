@@ -33,6 +33,6 @@ private:
     void PrintInventoryForSell(const PlayerCharacter* player) const;
     void SellItemInShop(int invIndex, Gamemode& gamemode);
     void OpenSellMenu(Gamemode& gamemode);
-	void OpenBuyMenu(Gamemode& gamemode);
+    void OpenBuyMenu(Gamemode& gamemode);
 };
 
