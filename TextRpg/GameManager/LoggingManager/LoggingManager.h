@@ -2,6 +2,12 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <Windows.h>
+#endif
 
 enum class LogHeader { Error, Warning, Info };
 
@@ -41,13 +47,20 @@ public:
     
         logFile << lineForLogging << std::endl;
         logFile.flush();
+        WriteToLogConsole(lineForLogging);
     };
 
-    void ViewLog() const;
     
 private:
     std::string currentLogFilePath;
     std::ofstream logFile;
     
     std::string GetTimestamp() const;
+    bool InitializeLogConsole();
+    void WriteToLogConsole(const std::string& line);
+    
+#ifdef _WIN32
+    HANDLE logPipeWrite = nullptr;
+    PROCESS_INFORMATION logProcessInfo{};
+#endif
 };
