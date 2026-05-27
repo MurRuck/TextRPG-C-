@@ -76,4 +76,10 @@ void EnemyBase::OnDeath(PlayerCharacter* player)
 	player->GainEXP(exp);
 	player->GainGold(gold);
 	player->AddItem(std::make_unique<DropItem>(dropItemName));
+	
+	int roll = rand() % 100;
+	if (roll < 30)
+	{
+		player->AddItem(std::make_unique<DropItem>(dropItemName));
+	}
 }
