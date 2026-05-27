@@ -56,11 +56,12 @@ void PlayerCharacter::GainGold(int amount)
     gold += amount;
 }
 
-void PlayerCharacter::BuyItem(int amount)
+void PlayerCharacter::BuyItem(int amount, std::unique_ptr<Item> item)
 {
     if (amount <= 0 || !IsCanBuy(amount))
         return;
-
+    
+    AddItem(std::move(item));
     gold -= amount;
 }
 
@@ -102,6 +103,16 @@ void PlayerCharacter::UseItem(int index)
         return;
     
     inventory[index]->use(this);
+    
+    inventory.erase(inventory.begin() + index);
+}
+
+void PlayerCharacter::SellItem(int index)
+{
+    if (index < 0 || index >= static_cast<int>(inventory.size()))
+        return;
+    
+    GainGold(inventory[index]->getPrice());
     
     inventory.erase(inventory.begin() + index);
 }
