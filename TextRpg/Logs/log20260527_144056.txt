@@ -1,0 +1,5 @@
+[Info] Battle StartPlayer entered battle
+[Info] Monster SpawnOrc
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack7
+[Info] Player Attack40

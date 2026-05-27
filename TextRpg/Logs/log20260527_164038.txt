@@ -1,0 +1,4 @@
+[Info] Battle StartPlayer entered battle
+[Info] Monster SpawnSlime
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack5

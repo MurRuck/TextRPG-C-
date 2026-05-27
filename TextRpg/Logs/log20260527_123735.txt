@@ -1,0 +1,23 @@
+[Info] Battle StartPlayer entered battle
+[Info] Monster SpawnGoblin
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack17
+[Info] Player Attack40
+[Warning] Monster Attack17
+[Info] Player Attack40
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnGoblin
+[Warning] Monster Attack17
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack17
+[Info] Potion UseRandom action - used potion
+[Warning] Monster Attack17
+[Info] Player Attack40
+[Warning] Monster Attack17
+[Warning] Buff EndAttack buff removed
+[Info] Potion UseRandom action - used potion
+[Warning] Monster Attack17
+[Info] Player Attack30
+[Info] RewardEXP & Gold granted
+[Info] Battle EndBattle finished

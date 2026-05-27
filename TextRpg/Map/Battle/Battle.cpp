@@ -1,15 +1,21 @@
 ﻿#include "Battle.h"
 #include <iostream>
 #include <cstdlib>
+#include <windows.h>
+#include "../../GameManager/Gamemode/Gamemode.h"
+
 
 using namespace std;
 
 // =========================
 // UI 출력
 // =========================
-void BattleLoop::DisplayUI(const std::string& log) const
+void BattleLoop::DisplayUI() const
 {
+	
     system("cls");
+
+    
 
     cout << "==============================================\n";
     cout << "           TEXT RPG BATTLE\n";
@@ -18,12 +24,16 @@ void BattleLoop::DisplayUI(const std::string& log) const
     // =========================
     // HEADER
     // =========================
-    //cout << " [ " << player->GetName() << " ]"
-    //    << "                     "
-    //    << "[ " << (monster ? monster->GetName() : "None") << " ]\n";
+    cout << " [ " << player->GetName() << " ]"
+        << "                     "
+        << "[ " << (monster ? monster->GetName() : "None") << " ]\n";
+    cout << " [Lv. " << player->GetLevel() << "]" << " [EXP:" << player->GetEXP() << " / " << player->GetRequiredEXP() << "]\n";
+       
+       
 
-    //cout << "----------------------------------------------\n";
-
+    cout << "----------------------------------------------\n";
+	cout << "[보유골드: " << player->GetGold() << "G] \n";
+	cout << "==============================================\n";
     // =========================
     // HP / ATK
     // =========================
@@ -50,6 +60,7 @@ void BattleLoop::DisplayUI(const std::string& log) const
     // BUFF
     // =========================
     cout << " BUFF : ";
+
     if (buffTurn > 0)
         cout << buffTurn << " turn(s)\n";
     else
@@ -58,17 +69,39 @@ void BattleLoop::DisplayUI(const std::string& log) const
     cout << "==============================================\n";
 
     // =========================
-    // LOG (3줄)
+    // LOG
     // =========================
     cout << " LOG\n";
     cout << "----------------------------------------------\n";
 
-    cout << " > " << log << "\n";
+    cout << " > " << lastLog1 << "\n";
     cout << " > " << lastLog2 << "\n";
     cout << " > " << lastLog3 << "\n";
 
     cout << "==============================================\n";
+
+
+    Sleep(700);
 }
+
+// =========================
+// 로그 추가
+// =========================
+void BattleLoop::PushLog(const std::string& newLog)
+{
+    lastLog3 = lastLog2;
+    lastLog2 = lastLog1;
+    lastLog1 = newLog;
+}
+// 전투 종료시 전투로그 초기화
+
+void BattleLoop::ClearLog()
+{
+    lastLog1.clear();
+    lastLog2.clear();
+    lastLog3.clear();
+}
+
 // =========================
 // 전투 시작
 // =========================
@@ -86,41 +119,67 @@ void BattleLoop::StartBattle(PlayerCharacter* player)
     while (true)
     {
         PlayerTurn();
-        if (CheckBattleEnd())
-            break;
+        if (CheckBattleEnd()) break;
 
         MonsterTurn();
-        if (CheckBattleEnd())
-            break;
+        if (CheckBattleEnd()) break;
     }
 
-    GiveReward();
-
-    logger.Add(LogHeader::Info, "Battle End", "Battle finished");
+    HandleBattleEnd();
 }
-
 // =========================
 // 몬스터 생성
 // =========================
 void BattleLoop::CreateMonster()
 {
-    int type = rand() % 3;// 임시
+    int type = rand() % 3;
 
-    if (type == 0)
+    string name;
+    int level = player->GetLevel();   // ⭐ 기본값 반드시 초기화
+
+    if(player->IsMaxLevel())
     {
-        monster = std::make_unique<EnemyBase>("Slime", 1);
-    }
-    else if (type == 1)
+        type = 4; 
+       
+	}
+
+
+
+    switch (type)
     {
-        monster = std::make_unique<EnemyBase>("Goblin", 2);
-    }
-    else
-    {
-        monster = std::make_unique<EnemyBase>("Orc", 3);
+    case 0:
+        name = "Slime";
+        level += (rand() % 2 - 1);   // -1 ~ 0
+        break;
+
+    case 1:
+        name = "Goblin";
+        level += (rand() % 3 - 1);   // -1 ~ +1
+        break;
+
+    case 2:
+        name = "Orc";
+        level += (rand() % 2 + 1);   // +1 ~ +2
+        break;
+
+    case 4:
+        name = "Boss";
+        level += 10;   // +2 ~ +4
+        break;
+
     }
 
-    DisplayUI("몬스터 등장!");
-    logger.Add(LogHeader::Info, "Monster Spawn", monster->GetName());
+   
+    level = std::max(1, level);
+
+    monster = std::make_unique<EnemyBase>(name, level, 1.0f);
+
+    PushLog(name + " 등장!");
+    DisplayUI();
+
+    logger.Add(LogHeader::Info,
+        "Monster Spawn",
+        monster->GetName());
 }
 
 // =========================
@@ -128,7 +187,7 @@ void BattleLoop::CreateMonster()
 // =========================
 bool BattleLoop::HasItem() const
 {
-    return true;  //추가예정
+    return true;
 }
 
 // =========================
@@ -141,10 +200,14 @@ void BattleLoop::PlayerTurn()
     if (buffTurn > 0)
     {
         buffTurn--;
+
         if (buffTurn == 0)
         {
             player->SetAttack(player->GetAttack() - 10);
-            DisplayUI("버프 종료!");
+
+            PushLog("버프 종료!");
+            DisplayUI();
+
             logger.Add(LogHeader::Warning, "Buff End", "Attack buff removed");
         }
     }
@@ -154,13 +217,18 @@ void BattleLoop::PlayerTurn()
         if (HasItem())
         {
             player->UseItem(0);
-            DisplayUI("HP 포션 사용!");
+
+            PushLog("HP 포션 사용!");
+            Attack();
+            DisplayUI();
+
             logger.Add(LogHeader::Info, "Potion Use", "HP critical - used item");
         }
         else
         {
             Attack();
         }
+
         return;
     }
 
@@ -170,6 +238,7 @@ void BattleLoop::PlayerTurn()
             UseBuff();
         else
             Attack();
+
         return;
     }
 
@@ -180,7 +249,10 @@ void BattleLoop::PlayerTurn()
     else
     {
         player->UseItem(0);
-        DisplayUI("포션 사용!");
+
+        PushLog("포션 사용!");
+        DisplayUI();
+
         logger.Add(LogHeader::Info, "Potion Use", "Random action - used potion");
     }
 }
@@ -191,49 +263,53 @@ void BattleLoop::PlayerTurn()
 void BattleLoop::MonsterTurn()
 {
     int damage = monster->GetAttack();
+
     player->TakeDamage(damage);
 
-    DisplayUI(monster->GetName() + " 공격! " + to_string(damage) + " 데미지");
+    PushLog(monster->GetName() + " 공격! "
+        + to_string(damage) + " 데미지");
+
+    DisplayUI();
+
     logger.Add(LogHeader::Warning, "Monster Attack", damage);
 }
 
 // =========================
 // 전투 종료 체크
 // =========================
-bool BattleLoop::CheckBattleEnd() const
+bool BattleLoop::CheckBattleEnd()
 {
     if (!player || !monster)
         return true;
 
     if (!monster->IsAlive())
-    {
-        DisplayUI("승리!");
         return true;
-    }
 
     if (player->IsDead())
-    {
-        DisplayUI("패배...");
         return true;
-    }
 
     return false;
 }
+
+ 
 
 // =========================
 // 보상 지급
 // =========================
 void BattleLoop::GiveReward()
 {
-    if (!player)
+    if (!player || !monster)
         return;
 
     if (!player->IsDead())
     {
-        player->GainEXP(monster->GetExp());
-        player->GainGold(monster->GetGold());
+        monster->OnDeath(player);
+
+        PushLog("보상 획득!");
+        DisplayUI();
+
+
         logger.Add(LogHeader::Info, "Reward", "EXP & Gold granted");
-        DisplayUI("보상 획득!");
     }
 
     monster.reset();
@@ -248,9 +324,14 @@ void BattleLoop::Attack()
         return;
 
     int damage = player->GetAttack();
+
     monster->TakeDamage(damage);
 
-    DisplayUI("플레이어 공격! " + to_string(damage) + " 데미지");
+    PushLog("플레이어 공격! "
+        + to_string(damage) + " 데미지");
+
+    DisplayUI();
+
     logger.Add(LogHeader::Info, "Player Attack", damage);
 }
 
@@ -260,8 +341,72 @@ void BattleLoop::Attack()
 void BattleLoop::UseBuff()
 {
     player->SetAttack(player->GetAttack() + 10);
+
     buffTurn = 3;
 
-    DisplayUI("공격력 버프 사용! ATK +" + to_string(10) + " (3턴)");
+    PushLog("공격력 버프 사용! ATK +10 (3턴)");
+    DisplayUI();
+
     logger.Add(LogHeader::Warning, "Buff Used", "Attack +10 for 3 turns");
+}
+
+void BattleLoop::ShowEndMenu()
+{
+	COORD menupos = { 0,12 };   
+
+    for (int i = 0; i < 6; i++)
+    {
+        cout << "                                            \n";
+    }
+
+    
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), menupos);
+
+    cout << "==============================================\n";
+    cout << "다음 행동 선택                                \n";
+    cout << "==============================================\n";
+    cout << " [1] 전투                                     \n";
+    cout << " [2] 상점                                     \n";
+    cout << " [3] 인벤토리                                 \n";
+    cout << " [4] 게임 종료                                \n" ;
+    cout << "==============================================\n";
+}
+PlayerState BattleLoop::HandleBattleEnd()
+{
+    if (player->IsDead())
+    {
+        PushLog("패배...");
+        DisplayUI();
+
+        return PlayerState::Create; 
+    }
+
+    PushLog("승리!");
+    DisplayUI();
+
+    GiveReward();
+    ShowEndMenu();
+
+    int input;
+    cin >> input;
+
+    switch (input)
+    {
+    case 1:
+        ClearLog();
+        StartBattle(player);
+        return PlayerState::Battle;
+
+    case 2:
+        return PlayerState::Shop;
+
+    case 3:
+        return PlayerState::Create; // 
+
+    case 4:
+        return PlayerState::Shop; // 임시 fallback
+
+    default:
+        return PlayerState::Battle;
+    }
 }
