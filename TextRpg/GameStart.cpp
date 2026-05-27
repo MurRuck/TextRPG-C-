@@ -21,13 +21,9 @@ void GameStart()
     SetConsoleCP(CP_UTF8);
 
     Gamemode Gamemode;
-    LoggingManager log;
-
-    log.Add(LogHeader::Warning, "테스트 : ", std::string("테스트1"));
-    log.Add(LogHeader::Warning, "테스트 : ", std::string("테스트2"));
     std::cout << "start" << std::endl;
 
-    BattleLoop battle;
+    BattleLoop battle(Gamemode);
     PlayerCharacter tempPlayer("TestPlayer");
     battle.StartBattle(&tempPlayer);
 

@@ -1,16 +1,18 @@
 ﻿#pragma once
 #include "../../Entity/Character/PlayerCharacter.h"
 #include "../../Entity/Enemy/EnemyBase.h"
-#include "../../GameManager/LoggingManager/LoggingManager.h"
-#include <memory>
-#include <string>
 #include "../../GameManager/Gamemode/Gamemode.h"
 
-enum class PlayerState;
+#include <memory>
+#include <string>
+
 
 class BattleLoop
 {
 public:
+    BattleLoop(Gamemode& gamemode) : gamemode(gamemode) {}
+    ~BattleLoop() {}
+
     void StartBattle(PlayerCharacter* player);
     PlayerState HandleBattleEnd();
 
@@ -30,10 +32,11 @@ private:
 
 
 private:
+    Gamemode& gamemode;
     PlayerCharacter* player = nullptr;
     std::unique_ptr<EnemyBase> monster;
     int buffTurn = 0;
-    LoggingManager logger;
+    
 
    
     void PushLog(const std::string& newLog);

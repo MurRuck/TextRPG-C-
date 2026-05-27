@@ -26,7 +26,7 @@ void Gamemode::LoopRun()
 
         case PlayerState::Battle:
         {
-            BattleLoop battle;
+            BattleLoop battle(*this);
 
             battle.StartBattle(player.get());
 

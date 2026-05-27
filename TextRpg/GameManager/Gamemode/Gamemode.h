@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include <cstdlib>
 #include <memory>
-#include "../../Map/Battle/Battle.h"
 #include "../../Entity/Character/PlayerCharacter.h"
+#include "../LoggingManager/LoggingManager.h"
 
 class MapBase;
 
@@ -13,7 +13,19 @@ class Gamemode
 public:
     Gamemode();
     ~Gamemode();
-
+    
+    
+    // logger getter;
+    LoggingManager* GetLogger()
+    {
+        return logger.get();
+    }
+    
+    // logger getter const
+    const LoggingManager* GetLogger() const
+    {
+        return logger.get();
+    } 
 
     // player getter
     const PlayerCharacter& GetPlayerCharacter() const { return *player; }
@@ -26,15 +38,18 @@ public:
     }
 
     // state getter
-    PlayerState GetPlayerState() const;
+    PlayerState GetPlayerState() const { return currentState; }
 
     // state setter
     void SetPlayerState(PlayerState newState) { currentState = newState; }
     void LoopRun();
+    
+    
 
 
 private:
     std::unique_ptr<PlayerCharacter> player;
+    std::unique_ptr<LoggingManager> logger = std::make_unique<LoggingManager>();
     PlayerState currentState = PlayerState::Create;
 };
 

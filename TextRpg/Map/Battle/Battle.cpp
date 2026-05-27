@@ -112,7 +112,7 @@ void BattleLoop::StartBattle(PlayerCharacter* player)
     if (!player)
         return;
 
-    logger.Add(LogHeader::Info, "Battle Start", "Player entered battle");
+    gamemode.GetLogger()->Add(LogHeader::Info, "Battle Start", "Player entered battle");
 
     CreateMonster();
 
@@ -177,7 +177,7 @@ void BattleLoop::CreateMonster()
     PushLog(name + " 등장!");
     DisplayUI();
 
-    logger.Add(LogHeader::Info,
+    gamemode.GetLogger()->Add(LogHeader::Info,
         "Monster Spawn",
         monster->GetName());
 }
@@ -208,7 +208,7 @@ void BattleLoop::PlayerTurn()
             PushLog("버프 종료!");
             DisplayUI();
 
-            logger.Add(LogHeader::Warning, "Buff End", "Attack buff removed");
+            gamemode.GetLogger()->Add(LogHeader::Warning, "Buff End", "Attack buff removed");
         }
     }
 
@@ -222,7 +222,7 @@ void BattleLoop::PlayerTurn()
             Attack();
             DisplayUI();
 
-            logger.Add(LogHeader::Info, "Potion Use", "HP critical - used item");
+            gamemode.GetLogger()->Add(LogHeader::Info, "Potion Use", "HP critical - used item");
         }
         else
         {
@@ -253,7 +253,7 @@ void BattleLoop::PlayerTurn()
         PushLog("포션 사용!");
         DisplayUI();
 
-        logger.Add(LogHeader::Info, "Potion Use", "Random action - used potion");
+        gamemode.GetLogger()->Add(LogHeader::Info, "Potion Use", "Random action - used potion");
     }
 }
 
@@ -271,7 +271,7 @@ void BattleLoop::MonsterTurn()
 
     DisplayUI();
 
-    logger.Add(LogHeader::Warning, "Monster Attack", damage);
+    gamemode.GetLogger()->Add(LogHeader::Warning, "Monster Attack", damage);
 }
 
 // =========================
@@ -309,7 +309,7 @@ void BattleLoop::GiveReward()
         DisplayUI();
 
 
-        logger.Add(LogHeader::Info, "Reward", "EXP & Gold granted");
+        gamemode.GetLogger()->Add(LogHeader::Info, "Reward", "EXP & Gold granted");
     }
 
     monster.reset();
@@ -332,7 +332,7 @@ void BattleLoop::Attack()
 
     DisplayUI();
 
-    logger.Add(LogHeader::Info, "Player Attack", damage);
+    gamemode.GetLogger()->Add(LogHeader::Info, "Player Attack", damage);
 }
 
 // =========================
@@ -347,7 +347,7 @@ void BattleLoop::UseBuff()
     PushLog("공격력 버프 사용! ATK +10 (3턴)");
     DisplayUI();
 
-    logger.Add(LogHeader::Warning, "Buff Used", "Attack +10 for 3 turns");
+    gamemode.GetLogger()->Add(LogHeader::Warning, "Buff Used", "Attack +10 for 3 turns");
 }
 
 void BattleLoop::ShowEndMenu()
