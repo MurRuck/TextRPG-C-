@@ -1,0 +1,101 @@
+[Info] Battle StartPlayer entered battle
+[Info] Monster SpawnGoblin
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack9
+[Info] Player Attack40
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnOrc
+[Warning] Monster Attack13
+[Info] Player Attack40
+[Warning] Monster Attack13
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack13
+[Info] Player Attack40
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnGoblin
+[Warning] Monster Attack5
+[Info] Player Attack40
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnGoblin
+[Warning] Monster Attack5
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack5
+[Info] Player Attack50
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnOrc
+[Warning] Monster Attack21
+[Info] Player Attack50
+[Warning] Monster Attack21
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack21
+[Info] Player Attack50
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnSlime
+[Warning] Monster Attack18
+[Info] Player Attack65
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnGoblin
+[Warning] Monster Attack27
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack27
+[Info] Player Attack65
+[Warning] Monster Attack27
+[Info] Player Attack65
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnOrc
+[Warning] Monster Attack25
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack25
+[Info] Player Attack85
+[Warning] Monster Attack25
+[Info] Player Attack85
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnOrc
+[Warning] Monster Attack38
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack38
+[Info] Player Attack110
+[Warning] Monster Attack38
+[Info] Player Attack110
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnGoblin
+[Warning] Monster Attack65
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack65
+[Info] Player Attack175
+[Warning] Monster Attack65
+[Info] Player Attack175
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnOrc
+[Warning] Monster Attack66
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack66
+[Info] Player Attack260
+[Warning] Monster Attack66
+[Info] Player Attack260
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnBoss
+[Warning] Monster Attack184
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack184
+[Info] Player Attack310
+[Warning] Monster Attack184
+[Info] Potion UseRandom action - used potion
+[Warning] Monster Attack184
+[Warning] Buff EndAttack buff removed
+[Info] Potion UseRandom action - used potion
+[Warning] Monster Attack184
+[Info] Potion UseHP critical - used item
+[Warning] Monster Attack184
+[Info] Potion UseHP critical - used item
+[Warning] Monster Attack184
+[Info] Battle EndBattle finished

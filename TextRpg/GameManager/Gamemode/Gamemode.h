@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <cstdlib>
 #include <memory>
-
+#include "../../Map/Battle/Battle.h"
 #include "../../Entity/Character/PlayerCharacter.h"
 
 class MapBase;
@@ -30,6 +30,7 @@ public:
 
     // state setter
     void SetPlayerState(PlayerState newState) { currentState = newState; }
+    void LoopRun();
 
 
 private:

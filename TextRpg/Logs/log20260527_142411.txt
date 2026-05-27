@@ -1,0 +1,12 @@
+[Info] Battle StartPlayer entered battle
+[Info] Monster SpawnOrc
+[Warning] Buff UsedAttack +10 for 3 turns
+[Warning] Monster Attack20
+[Info] Player Attack40
+[Warning] Monster Attack20
+[Info] Player Attack40
+[Info] RewardEXP & Gold granted
+[Info] Monster SpawnSlime
+[Warning] Monster Attack9
+[Warning] Buff EndAttack buff removed
+[Warning] Buff UsedAttack +10 for 3 turns
