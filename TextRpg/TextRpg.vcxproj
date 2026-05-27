@@ -164,6 +164,11 @@
     <ClInclude Include="Map\Battle\Battle.h" />
     <ClInclude Include="Map\Shop\Shop.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LogConsole\LogConsole.vcxproj">
+      <Project>{b2a4e0ca-bb71-4a50-8714-72588e66526e}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

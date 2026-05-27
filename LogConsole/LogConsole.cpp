@@ -1,9 +1,10 @@
 ﻿ // LogConsole.cpp : 이 파일에는 'main' 함수가 포함됩니다. 거기서 프로그램 실행이 시작되고 종료됩니다.
 //
 
+#include <Windows.h>
+#include <conio.h>
 #include <iostream>
 #include <string>
-#include <Windows.h>
 
 void  SetColor(WORD color)
 {
@@ -60,6 +61,10 @@ int main()
     {
         PrintLogLine(line);
     }
+
+    std::cout << "\n========== Logger disconnected ==========" << std::endl;
+    std::cout << "Press any key to close..." << std::endl;
+    _getch();
      
      return 0;
 }
