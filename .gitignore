@@ -2,6 +2,7 @@ Binaries/
 DerivedDataCache/
 Intermediate/
 Saved/
+Logs/
 
 # Plugin generated folders
 Plugins/**/Binaries/
