@@ -21,22 +21,18 @@ class Shop
 {
 public:
     Shop();
-
-    // 전투 후 상점 입장 여부 질문
-    // y → SetPlayerState(PlayerState::Shop)
-    // n → 상태 변경 없음
-    static void AskEnterShop(Gamemode& gamemode);
-
-    // 상점 구매 루프 - 입장 후 호출
+        
+    void AskEnterShop(Gamemode& gamemode);
     void OpenShop(Gamemode& gamemode);
 
 private:
     LoggingManager logManager;
     std::vector<ShopEntry> stock_; // 재고 목록 
-    void PrintStock(const PlayerCharacter* player) const;
-    void BuyItem(int index, Gamemode& gamemode);
+    void ShopMain(const PlayerCharacter* player) const;
+    void BuyItemInShop(int index, Gamemode& gamemode);
     void PrintInventoryForSell(const PlayerCharacter* player) const;
-    void SellItem(int invIndex, Gamemode& gamemode);
+    void SellItemInShop(int invIndex, Gamemode& gamemode);
     void OpenSellMenu(Gamemode& gamemode);
+	void OpenBuyMenu(Gamemode& gamemode);
 };
 
