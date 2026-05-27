@@ -65,8 +65,7 @@ void Shop::ShopMain(const PlayerCharacter* player) const
 	std::cout << "=====================================\n";
     std::cout << "            *  S H O P  *            \n";
     std::cout << "=====================================\n";
-    //ShowStatus() const
-
+   
     std::cout << "  1. Buy Item\n";
     std::cout << "  2. Sell Item\n";
     std::cout << "  3. Leave Shop\n";
@@ -82,11 +81,11 @@ void Shop::BuyItemInShop(int index, Gamemode& gamemode)
     if (!player) return;
 
     ShopEntry& entry = stock_[index];
-    auto itemPtr = entry.factory();               // 구매할 아이템 생성
+    auto itemPtr = entry.factory();         // 구매할 아이템 생성
     int price = itemPtr->getPrice();
     std::string itemName = itemPtr->getName();
 
-    // 현재 골드/재고 리스트 출력(기존 스타일 유지)
+    // 현재 골드/재고 리스트 출력
     std::cout << "  Gold: " << player->GetGold() << "G\n";
     for (int i = 0; i < (int)stock_.size(); ++i)
     {
