@@ -53,7 +53,7 @@ namespace
         std::cout << "선택 > ";
     }
 
-    void CreatePlayer(Gamemode& gameMode, LoggingManager& log)
+    void CreatePlayer(Gamemode& gameMode)
     {
         ConsoleUI::Clear();
         ConsoleUI::PrintTitle("캐릭터 생성");
@@ -65,10 +65,10 @@ namespace
             name = ReadInput();
         } while (name.empty());
 
-        auto player = std::make_unique<PlayerCharacter>(name);
+        auto player = std::make_unique<PlayerCharacter>(name, &gameMode);
         gameMode.SetPlayerCharceter(std::move(player));
         gameMode.SetPlayerState(PlayerState::Create);
-        log.Add(LogHeader::Info, "Player Created: ", name);
+        gameMode.GetLogger()->Add(LogHeader::Info, "Player Created: ", name);
 
         ConsoleUI::Clear();
         AsciiArt::Print(ArtType::Player);
@@ -127,8 +127,8 @@ namespace
 
         gameMode.SetPlayerState(PlayerState::Shop);
 
-        Shop shop;
-        shop.OpenShop(gameMode);
+        Shop shop(&gameMode);
+        shop.OpenShop();
 
         gameMode.SetPlayerState(PlayerState::Create);
     }
@@ -189,7 +189,7 @@ void GameStart()
 
         if (input == "1" || input == "새 게임")
         {
-            CreatePlayer(gameMode, log);
+            CreatePlayer(gameMode);
         }
         else if (input == "2" || input == "던전 입장")
         {

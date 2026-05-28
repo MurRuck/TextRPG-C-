@@ -1,14 +1,15 @@
 ﻿#pragma once
 #include "../../Item/Item.h"
-#include "../../GameManager/LoggingManager/LoggingManager.h"
 #include<string>
 #include <memory>
 #include <vector>
 #include "Skill.h"
+class Gamemode;
+
 class PlayerCharacter
 {
 public:     //공개된
-    explicit PlayerCharacter(const std::string& characterName = "Player");
+    explicit PlayerCharacter(const std::string& characterName = "Player", Gamemode* gamemode_ptr = nullptr);
 
     void ShowStatus() const;                        //스탯 보여주기
     void TakeDamage(int damage);                    //데미지주기
@@ -51,9 +52,11 @@ public:     //공개된
     void SetHP(int amount);
     void SetMP(int amount);
     void SetAttack(int amount);
+
+    
 private:        //비공개
-    LoggingManager logManager;
     static constexpr int MAX_LEVEL = 10;
+    Gamemode* gamemode = nullptr;
 
     std::string name;
     int maxHP = 200;
