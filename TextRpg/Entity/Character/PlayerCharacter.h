@@ -1,13 +1,13 @@
 ﻿#pragma once
 #include "../../Item/Item.h"
+#include "../../GameManager/LoggingManager/LoggingManager.h"
 #include<string>
 #include <memory>
 #include <vector>
 #include "Skill.h"
 class PlayerCharacter
-
 {
-public:
+public:     //공개된
     explicit PlayerCharacter(const std::string& characterName = "Player");
 
     void ShowStatus() const;                        //스탯 보여주기
@@ -21,6 +21,7 @@ public:
     
     void AddItem(std::unique_ptr<Item> item);       //아이템 얻기임
     void ShowInventory() const;                     //인벤토리 보여주기임
+    void ShowItemInspector(int index) const;        //아이템 정보 보여주기
     void UseItem(int index);                        //아이템 사용하기임
     void SellItem(int index);                       //아이템 삭제임
     
@@ -50,7 +51,8 @@ public:
     void SetHP(int amount);
     void SetMP(int amount);
     void SetAttack(int amount);
-private:
+private:        //비공개
+    LoggingManager logManager;
     static constexpr int MAX_LEVEL = 10;
 
     std::string name;

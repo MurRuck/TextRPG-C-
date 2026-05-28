@@ -148,6 +148,8 @@
     <ClCompile Include="Map\Battle\Battle.cpp" />
     <ClCompile Include="Map\Shop\Shop.cpp" />
     <ClCompile Include="TextRpg.cpp" />
+    <ClCompile Include="UI\AsciiArt.cpp" />
+    <ClCompile Include="UI\ConsoleUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity\Character\PlayerCharacter.h" />
@@ -163,6 +165,8 @@
     <ClInclude Include="Item\Item.h" />
     <ClInclude Include="Map\Battle\Battle.h" />
     <ClInclude Include="Map\Shop\Shop.h" />
+    <ClInclude Include="UI\AsciiArt.h" />
+    <ClInclude Include="UI\ConsoleUI.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LogConsole\LogConsole.vcxproj">

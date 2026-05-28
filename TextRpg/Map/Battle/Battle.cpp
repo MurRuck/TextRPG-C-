@@ -1,87 +1,108 @@
 ﻿#include "Battle.h"
 #include <iostream>
 #include <cstdlib>
+#include <string>
+#include <vector>
 #include <windows.h>
 #include "../../GameManager/Gamemode/Gamemode.h"
+#include "../../UI/AsciiArt.h"
 
 
 using namespace std;
+
+namespace
+{
+    ArtType GetMonsterArtType(const std::unique_ptr<EnemyBase>& monster)
+    {
+        if (!monster)
+            return ArtType::Slime;
+
+        const std::string name = monster->GetName();
+        if (name == "Goblin")
+            return ArtType::Goblin;
+        if (name == "Orc")
+            return ArtType::Orc;
+        if (name == "Boss")
+            return ArtType::Boss;
+
+        return ArtType::Slime;
+    }
+}
 
 // =========================
 // UI 출력
 // =========================
 void BattleLoop::DisplayUI() const
 {
-	
-    system("cls");
+    const vector<vector<string>>& testFrames = AsciiArt::GetTestAnimationFrames();
 
-    
+    const auto renderFrame = [this](const vector<string>& playerFrame)
+    {
+        system("cls");
 
-    cout << "==============================================\n";
-    cout << "           TEXT RPG BATTLE\n";
-    cout << "==============================================\n";
+        cout << "==============================================\n";
+        cout << "           TEXT RPG BATTLE\n";
+        cout << "==============================================\n";
+        cout << "PLAYER\n";
+        for (const string& line : playerFrame)
+        {
+            cout << line << "\n";
+        }
+        cout << "\nENEMY\n";
+        AsciiArt::Print(GetMonsterArtType(monster));
+        cout << "==============================================\n";
 
-    // =========================
-    // HEADER
-    // =========================
-    cout << " [ " << player->GetName() << " ]"
-        << "                     "
-        << "[ " << (monster ? monster->GetName() : "None") << " ]\n";
-    cout << " [Lv. " << player->GetLevel() << "]" << " [EXP:" << player->GetEXP() << " / " << player->GetRequiredEXP() << "]\n";
-       
-       
+        cout << " [ " << player->GetName() << " ]"
+            << "                     "
+            << "[ " << (monster ? monster->GetName() : "None") << " ]\n";
+        cout << " [Lv. " << player->GetLevel() << "]" << " [EXP:" << player->GetEXP() << " / " << player->GetRequiredEXP() << "]\n";
 
-    cout << "----------------------------------------------\n";
-	cout << "[보유골드: " << player->GetGold() << "G] \n";
-	cout << "==============================================\n";
-    // =========================
-    // HP / ATK
-    // =========================
-    cout << " HP  : " << player->GetHP()
-        << " / " << player->GetMaxHP()
-        << "              ";
+        cout << "----------------------------------------------\n";
+        cout << "[보유골드: " << player->GetGold() << "G] \n";
+        cout << "==============================================\n";
 
-    if (monster)
-        cout << "HP  : " << monster->GetHp() << "\n";
-    else
-        cout << "HP  : -\n";
+        cout << " HP  : " << player->GetHP()
+            << " / " << player->GetMaxHP()
+            << "              ";
 
-    cout << " ATK : " << player->GetAttack()
-        << "                      ";
+        if (monster)
+            cout << "HP  : " << monster->GetHp() << "\n";
+        else
+            cout << "HP  : -\n";
 
-    if (monster)
-        cout << "ATK : " << monster->GetAttack() << "\n";
-    else
-        cout << "ATK : -\n";
+        cout << " ATK : " << player->GetAttack()
+            << "                      ";
 
-    cout << "----------------------------------------------\n";
+        if (monster)
+            cout << "ATK : " << monster->GetAttack() << "\n";
+        else
+            cout << "ATK : -\n";
 
-    // =========================
-    // BUFF
-    // =========================
-    cout << " BUFF : ";
+        cout << "----------------------------------------------\n";
+        cout << " BUFF : ";
 
-    if (buffTurn > 0)
-        cout << buffTurn << " turn(s)\n";
-    else
-        cout << "none\n";
+        if (buffTurn > 0)
+            cout << buffTurn << " turn(s)\n";
+        else
+            cout << "none\n";
 
-    cout << "==============================================\n";
+        cout << "==============================================\n";
+        cout << " LOG\n";
+        cout << "----------------------------------------------\n";
+        cout << " > " << lastLog1 << "\n";
+        cout << " > " << lastLog2 << "\n";
+        cout << " > " << lastLog3 << "\n";
+        cout << "==============================================\n";
+    };
 
-    // =========================
-    // LOG
-    // =========================
-    cout << " LOG\n";
-    cout << "----------------------------------------------\n";
-
-    cout << " > " << lastLog1 << "\n";
-    cout << " > " << lastLog2 << "\n";
-    cout << " > " << lastLog3 << "\n";
-
-    cout << "==============================================\n";
-
-
-    Sleep(700);
+    for (int repeat = 0; repeat < 3; ++repeat)
+    {
+        for (const vector<string>& frame : testFrames)
+        {
+            renderFrame(frame);
+            Sleep(180);
+        }
+    }
 }
 
 // =========================
@@ -125,7 +146,6 @@ void BattleLoop::StartBattle(PlayerCharacter* player)
         if (CheckBattleEnd()) break;
     }
 
-    HandleBattleEnd();
 }
 // =========================
 // 몬스터 생성
@@ -187,7 +207,7 @@ void BattleLoop::CreateMonster()
 // =========================
 bool BattleLoop::HasItem() const
 {
-    return true;
+    return false;
 }
 
 // =========================
@@ -373,10 +393,14 @@ void BattleLoop::ShowEndMenu()
 }
 PlayerState BattleLoop::HandleBattleEnd()
 {
+    if (!player)
+        return PlayerState::Create;
+
     if (player->IsDead())
     {
         PushLog("패배...");
         DisplayUI();
+        ClearLog();
 
         return PlayerState::Create; 
     }
@@ -385,28 +409,7 @@ PlayerState BattleLoop::HandleBattleEnd()
     DisplayUI();
 
     GiveReward();
-    ShowEndMenu();
+    ClearLog();
 
-    int input;
-    cin >> input;
-
-    switch (input)
-    {
-    case 1:
-        ClearLog();
-        StartBattle(player);
-        return PlayerState::Battle;
-
-    case 2:
-        return PlayerState::Shop;
-
-    case 3:
-        return PlayerState::Create; // 
-
-    case 4:
-        return PlayerState::Shop; // 임시 fallback
-
-    default:
-        return PlayerState::Battle;
-    }
+    return PlayerState::Create;
 }
