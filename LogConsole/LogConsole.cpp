@@ -47,6 +47,11 @@ void PrintLogLine(const std::string& line)
         header = "[Info]";
         headerColor = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
     }
+    else if (line.rfind("[System]",0) == 0)
+    {
+        header = "[System]";
+        headerColor = FOREGROUND_RED | FOREGROUND_GREEN |FOREGROUND_INTENSITY;
+    }
     
     if (!header.empty())
     {

@@ -2,9 +2,10 @@
 #include <vector>
 #include <memory>
 #include <functional>
-#include "../../GameManager/Gamemode/Gamemode.h"
-#include "../../GameManager/LoggingManager/LoggingManager.h"
 #include "../../Item/Item.h"
+
+class LoggingManager;
+class Gamemode;
 
 // ────────────────────────────────────────────
 //  상점 재고 항목
@@ -20,19 +21,20 @@ struct ShopEntry
 class Shop
 {
 public:
-    Shop();
+    Shop(Gamemode* gamemode_ptr = nullptr);
         
-    void AskEnterShop(Gamemode& gamemode);
-    void OpenShop(Gamemode& gamemode);
+    void AskEnterShop();
+    void OpenShop();
 
 private:
-    LoggingManager logManager;
+    Gamemode* gamemode = nullptr;
+    
     std::vector<ShopEntry> stock_; // 재고 목록 
     void ShopMain(const PlayerCharacter* player) const;
-    void BuyItemInShop(int index, Gamemode& gamemode);
+    void BuyItemInShop(int index);
     void PrintInventoryForSell(const PlayerCharacter* player) const;
-    void SellItemInShop(int invIndex, Gamemode& gamemode);
-    void OpenSellMenu(Gamemode& gamemode);
-    void OpenBuyMenu(Gamemode& gamemode);
+    void SellItemInShop(int invIndex);
+    void OpenSellMenu();
+    void OpenBuyMenu();
 };
 

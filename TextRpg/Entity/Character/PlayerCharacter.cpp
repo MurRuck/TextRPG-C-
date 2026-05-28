@@ -1,12 +1,13 @@
 ﻿#include "PlayerCharacter.h"
 #include <iostream>
-#include "../../GameManager/LoggingManager/LoggingManager.h"
+
+#include "../../GameManager/Gamemode/Gamemode.h"
 #include "../../UI/ConsoleUI.h"
 using namespace std;
 
 //public
-PlayerCharacter::PlayerCharacter(const std::string& characterName)
-    : name(characterName)
+PlayerCharacter::PlayerCharacter(const std::string& characterName, Gamemode* gamemode_ptr)
+    : name(characterName), gamemode(gamemode_ptr)
 {
     CreateCharacter();
 }
@@ -40,7 +41,7 @@ void PlayerCharacter::TakeDamage(int damage)
     if (IsDead())
         cout << "으앙 쥬금... (x_x)" << endl;
     
-    logManager.Add(LogHeader::Info, "PlayerDead", "IsDead" + to_string(IsDead()));
+    gamemode->GetLogger()->Add(LogHeader::Info, "Player : ", "Player Died " + to_string(IsDead()));
     
 }
 
@@ -60,31 +61,31 @@ void PlayerCharacter::GainGold(int amount)
 {
     if (amount <= 0)
     {
-        logManager.Add(LogHeader::Error, "WrongGold", amount);
+       gamemode->GetLogger()->Add(LogHeader::Error, "Player : WrongGold", amount);
         return;
     }
 
-    logManager.Add(LogHeader::Info, "GainGold:", amount);
+    gamemode->GetLogger()->Add(LogHeader::Info, "Player : Gain Gold ", amount);
     gold += amount;
     
-    logManager.Add(LogHeader::Info, "RemainGold:", name + " : " + to_string(GetGold()));
+    gamemode->GetLogger()->Add(LogHeader::Info, "Player : Remain Gold ", to_string(GetGold()));
 }
 
 void PlayerCharacter::BuyItem(int amount, std::unique_ptr<Item> item)
 {
     if (amount <= 0 || !IsCanBuy(amount) || item == nullptr)
     {
-        logManager.Add(LogHeader::Error, "Insufficient Balance", 
-            "Item : " + to_string(amount) + " RemainGold : " + to_string(GetGold()) ) ;
+        gamemode->GetLogger()->Add(LogHeader::Error, "Insufficient Balance ", "Item : " + to_string(amount));
+        gamemode->GetLogger()->Add(LogHeader::Info, "Player : RemainGold ", to_string(GetGold()));
         return;
     }
 
     const std::string itemName = item->getName();
     
     AddItem(std::move(item));
-    logManager.Add(LogHeader::Info, "BuyItem:", itemName);
+   gamemode->GetLogger()->Add(LogHeader::Info, "Player : Buy Item ", itemName);
     gold -= amount;
-    logManager.Add(LogHeader::Info, "RemainGold:", name + " : " + to_string(GetGold()));
+    gamemode->GetLogger()->Add(LogHeader::Info, "Player : Remain Gold ", to_string(GetGold()));
 }
 
 void PlayerCharacter::Heal(int amount)
@@ -112,7 +113,7 @@ void PlayerCharacter::AddItem(std::unique_ptr<Item> item)
 
     const std::string itemName = item->getName();
     inventory.push_back(std::move(item));
-    logManager.Add(LogHeader::Info, "AddItem:", itemName);
+    gamemode->GetLogger()->Add(LogHeader::Info, "Player : Add Item ", itemName);
 }
 
 void PlayerCharacter::ShowInventory() const
@@ -137,7 +138,7 @@ void PlayerCharacter::UseItem(int index)
     
     inventory[index]->use(this);
     
-    logManager.Add(LogHeader::Info, "UseItem:", inventory[index]->getName());
+    gamemode->GetLogger()->Add(LogHeader::Info, "Player : Use item ", inventory[index]->getName());
     
     inventory.erase(inventory.begin() + index);
 }
@@ -151,8 +152,8 @@ void PlayerCharacter::SellItem(int index)
     
     GainGold(sellPrice);
     
-    logManager.Add(LogHeader::Info, "SellItem:", sellPrice);
-    logManager.Add(LogHeader::Info, "RemainGold:", name + " : " + to_string(GetGold()));
+    gamemode->GetLogger()->Add(LogHeader::Info, "Player : Sell item ", sellPrice);
+    gamemode->GetLogger()->Add(LogHeader::Info, "Player : Remain Gold ",to_string(GetGold()));
     
     
     
@@ -171,13 +172,13 @@ void PlayerCharacter::CreateCharacter()
     mp = 100;
     exp = 0;
     attack = 30;
-    level = 10;
+    level = 1;
     gold = 0;
     max_EXP = 100;
 
     skills.clear();
     
-    logManager.Add(LogHeader::Info, "CreateCharacter:", name);
+    gamemode->GetLogger()->Add(LogHeader::System, "Player : Player name set ", name);
     //예시 skills.emplace_back("존나 개쌔게 내려찎기", 10, 20, SkillType::Attack);        
 }
 

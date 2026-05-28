@@ -11,7 +11,7 @@ enum class ArtType
     Goblin,
     Orc,
     Boss,
-    LevelUp,
+     LevelUp,
     Shop,
     NotEnoughGold,
     PurchaseSuccess

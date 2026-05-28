@@ -9,7 +9,7 @@
 #include <Windows.h>
 #endif
 
-enum class LogHeader { Error, Warning, Info };
+enum class LogHeader { Error, Warning, Info, System };
 
 class LoggingManager
 {
@@ -39,6 +39,10 @@ public:
         if (headText == LogHeader::Info)
         {
             headTextToString = "Info";
+        }
+        if (headText == LogHeader::System)
+        {
+            headTextToString = "System";
         }
     
         std::ostringstream logDataStream;

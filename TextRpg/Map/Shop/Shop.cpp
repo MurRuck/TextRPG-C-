@@ -8,6 +8,7 @@
 #include <mmsystem.h>
 
 #include "../../Entity/Character/PlayerCharacter.h"
+#include "../../GameManager/Gamemode/Gamemode.h"
 #include "../../GameManager/LoggingManager/LoggingManager.h"
 #include "../../Item/AttackBoost.h"
 #include "../../Item/HealthPotion.h"
@@ -21,7 +22,6 @@ namespace
     void ClearInput()
     {
         std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
     void WaitEnter()
@@ -79,20 +79,18 @@ namespace
     }
 }
 
-Shop::Shop()
+Shop::Shop(Gamemode* gamemode_ptr) : gamemode(gamemode_ptr)
 {
-    logManager.Initialize();
-
     stock_.push_back({ []() { return std::make_unique<HealthPotion>(); }, 5 });
     stock_.push_back({ []() { return std::make_unique<AttackBoost>(); }, 5 });
 }
 
-void Shop::AskEnterShop(Gamemode& gamemode)
+void Shop::AskEnterShop()
 {
     if (Confirm("상점에 입장하시겠습니까?"))
     {
-        gamemode.SetPlayerState(PlayerState::Shop);
-        OpenShop(gamemode);
+        gamemode->SetPlayerState(PlayerState::Shop);
+        OpenShop();
     }
 }
 
@@ -113,9 +111,9 @@ void Shop::ShopMain(const PlayerCharacter* player) const
     std::cout << "\n선택 > ";
 }
 
-void Shop::BuyItemInShop(int index, Gamemode& gamemode)
+void Shop::BuyItemInShop(int index)
 {
-    PlayerCharacter* player = gamemode.GetMutablePlayer();
+    PlayerCharacter* player = gamemode->GetMutablePlayer();
     ConsoleUI::Clear();
     if (player == nullptr)
     {
@@ -151,8 +149,8 @@ void Shop::BuyItemInShop(int index, Gamemode& gamemode)
 
     AsciiArt::Print(ArtType::PurchaseSuccess);
     PlayPurchaseSound();
-    logManager.Add(LogHeader::Info, "BuyItem:", itemName + " (-" + std::to_string(price) + "G)");
-    std::cout << itemName << " 구매 완료! 남은 골드: " << player->GetGold() << "G\n";
+    gamemode->GetLogger()->Add(LogHeader::System, "Player : ","Buy "+ itemName + " (-" + std::to_string(price) + "G)");
+    gamemode->GetLogger()->Add(LogHeader::Info, "Player : ", "Remain Gold " + player->GetGold());
 }
 
 void Shop::PrintInventoryForSell(const PlayerCharacter* player) const
@@ -169,21 +167,29 @@ void Shop::PrintInventoryForSell(const PlayerCharacter* player) const
     std::cout << "선택 > ";
 }
 
-void Shop::SellItemInShop(int invIndex, Gamemode& gamemode)
+void Shop::SellItemInShop(int invIndex)
 {
-    PlayerCharacter* player = gamemode.GetMutablePlayer();
+    
+    PlayerCharacter* player = gamemode->GetMutablePlayer();
     if (player == nullptr)
     {
         return;
     }
 
     player->SellItem(invIndex);
-    std::cout << "현재 골드: " << player->GetGold() << "G\n";
+    
+    auto item = stock_[invIndex].factory();
+    const int price = item->getPrice();
+    const std::string itemName = item->getName();
+    
+    gamemode->GetLogger()->Add(LogHeader::System, "Player : ","Sell "+ itemName + " (+" + std::to_string(price) + "G)");
+    gamemode->GetLogger()->Add(LogHeader::Info, "Player : ", "Remain Gold " + player->GetGold());
+    
 }
 
-void Shop::OpenSellMenu(Gamemode& gamemode)
+void Shop::OpenSellMenu()
 {
-    PlayerCharacter* player = gamemode.GetMutablePlayer();
+    PlayerCharacter* player = gamemode->GetMutablePlayer();
     if (player == nullptr)
     {
         return;
@@ -216,14 +222,14 @@ void Shop::OpenSellMenu(Gamemode& gamemode)
             return;
         }
 
-        SellItemInShop(input, gamemode);
+        SellItemInShop(input);
         WaitEnter();
     }
 }
 
-void Shop::OpenBuyMenu(Gamemode& gamemode)
+void Shop::OpenBuyMenu()
 {
-    PlayerCharacter* player = gamemode.GetMutablePlayer();
+    PlayerCharacter* player = gamemode->GetMutablePlayer();
     if (player == nullptr)
     {
         return;
@@ -280,16 +286,16 @@ void Shop::OpenBuyMenu(Gamemode& gamemode)
             return;
         }
 
-        BuyItemInShop(index, gamemode);
+        BuyItemInShop(index);
         WaitEnter();
     }
 }
 
-void Shop::OpenShop(Gamemode& gamemode)
+void Shop::OpenShop()
 {
     while (true)
     {
-        ShopMain(gamemode.GetMutablePlayer());
+        ShopMain(gamemode->GetMutablePlayer());
 
         int input;
         if (!(std::cin >> input))
@@ -303,11 +309,11 @@ void Shop::OpenShop(Gamemode& gamemode)
 
         if (input == 1)
         {
-            OpenBuyMenu(gamemode);
+            OpenBuyMenu();
         }
         else if (input == 2)
         {
-            OpenSellMenu(gamemode);
+            OpenSellMenu();
         }
         else if (input == 0)
         {
