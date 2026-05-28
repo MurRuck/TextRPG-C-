@@ -12,6 +12,8 @@
 #include "../../GameManager/LoggingManager/LoggingManager.h"
 #include "../../Item/AttackBoost.h"
 #include "../../Item/HealthPotion.h"
+
+
 #include "../../UI/AsciiArt.h"
 #include "../../UI/ConsoleUI.h"
 
@@ -116,6 +118,7 @@ void Shop::BuyItemInShop(int index)
     if (index < 0 || index >= static_cast<int>(stock_.size()))
     {
         std::cout << "없는 아이템 번호입니다.\n";
+		gamemode->GetLogger()->Add(LogHeader::System, "player ", "invaild number");
         return;
     }
 
@@ -127,6 +130,7 @@ void Shop::BuyItemInShop(int index)
     if (entry.stock <= 0)
     {
         std::cout << itemName << "은(는) 품절입니다.\n";
+		gamemode->GetLogger()->Add(LogHeader::Info, "Player ", itemName + "sold out");
         return;
     }
 
@@ -134,6 +138,8 @@ void Shop::BuyItemInShop(int index)
     {
         AsciiArt::Print(ArtType::NotEnoughGold);
         std::cout << "골드가 부족합니다. 필요 골드: " << price << "G\n";
+		gamemode->GetLogger()->Add(LogHeader::Info, "Player ", "needed gold: " + std::to_string(price) + "G");
+		WaitEnter();//골드부족 메시지 확인용 지원도 됨
         return;
     }
 
@@ -142,7 +148,8 @@ void Shop::BuyItemInShop(int index)
 
     AsciiArt::Print(ArtType::PurchaseSuccess);
     PlayPurchaseSound();
-    
+      
+	WaitEnter(); // 구매 완료 메시지 확인용 지워도  됨
 }
 
 void Shop::PrintInventoryForSell(const PlayerCharacter* player) const
@@ -160,8 +167,7 @@ void Shop::PrintInventoryForSell(const PlayerCharacter* player) const
 }
 
 void Shop::SellItemInShop(int invIndex)
-{
-    
+{    
     PlayerCharacter* player = gamemode->GetMutablePlayer();
     if (player == nullptr)
     {
@@ -173,9 +179,7 @@ void Shop::SellItemInShop(int invIndex)
     auto item = stock_[invIndex].factory();
     const int price = item->getPrice();
     const std::string itemName = item->getName();
-    
-    
-    
+           
 }
 
 void Shop::OpenSellMenu()
@@ -198,6 +202,7 @@ void Shop::OpenSellMenu()
         {
             ClearInput();
             std::cout << "숫자를 입력해주세요.\n";
+			gamemode->GetLogger()->Add(LogHeader::System, "player ", "invaild number");
             WaitEnter();
             continue;
         }
@@ -211,7 +216,17 @@ void Shop::OpenSellMenu()
         if (!Confirm("선택한 아이템을 판매하시겠습니까?"))
         {
             return;
+           
+            const int index = input - 1;
+            if (index < 0 || index >= static_cast<int>(stock_.size()))
+            {
+                std::cout << "없는 아이템 번호입니다.\n";
+                gamemode->GetLogger()->Add(LogHeader::System, "player ", "invaild number");
+                WaitEnter();
+                continue;
+            }
         }
+
 
         SellItemInShop(input);
         WaitEnter();
@@ -264,6 +279,7 @@ void Shop::OpenBuyMenu()
         if (index < 0 || index >= static_cast<int>(stock_.size()))
         {
             std::cout << "없는 아이템 번호입니다.\n";
+			gamemode->GetLogger()->Add(LogHeader::System, "player ", "invaild number");
             WaitEnter();
             continue;
         }
@@ -284,15 +300,18 @@ void Shop::OpenBuyMenu()
 
 void Shop::OpenShop()
 {
+	gamemode->GetLogger()->Add(LogHeader::System, "Player ", "entered shop");
     while (true)
     {
+		gamemode->GetLogger()->Add(LogHeader::System, "Player ", "opened shop menu");
         ShopMain(gamemode->GetMutablePlayer());
-
+   
         int input;
         if (!(std::cin >> input))
         {
             ClearInput();
             std::cout << "숫자를 입력해주세요.\n";
+			gamemode->GetLogger()->Add(LogHeader::System, "player ", "invaild number");
             WaitEnter();
             continue;
         }
@@ -300,14 +319,17 @@ void Shop::OpenShop()
 
         if (input == 1)
         {
+            gamemode->GetLogger()->Add(LogHeader::System, "Player ", "opened buy menu");
             OpenBuyMenu();
         }
         else if (input == 2)
         {
+            gamemode->GetLogger()->Add(LogHeader::System, "Player ", "opened sell menu");
             OpenSellMenu();
-        }
+	     }
         else if (input == 0)
         {
+            gamemode->GetLogger()->Add(LogHeader::System, "Player ", "left shop");
             std::cout << "상점에서 나갑니다.\n";
             WaitEnter();
             return;
@@ -315,6 +337,7 @@ void Shop::OpenShop()
         else
         {
             std::cout << "없는 메뉴입니다.\n";
+			gamemode->GetLogger()->Add(LogHeader::System, "player ", "invaild number");
             WaitEnter();
         }
     }
