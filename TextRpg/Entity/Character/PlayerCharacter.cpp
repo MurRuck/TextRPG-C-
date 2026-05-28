@@ -1,6 +1,7 @@
 ﻿#include "PlayerCharacter.h"
 #include <iostream>
 #include "../../GameManager/LoggingManager/LoggingManager.h"
+#include "../../UI/ConsoleUI.h"
 using namespace std;
 
 //public
@@ -12,15 +13,19 @@ PlayerCharacter::PlayerCharacter(const std::string& characterName)
 
 void PlayerCharacter::ShowStatus() const
 {
-    cout << "===== 캐릭터 상태 =====" << endl;
-    cout << "이름: " << name << endl;
-    cout << "레벨: " << level << endl;
-    cout << "체력: " << hp << " / " << maxHP << endl;
-    cout << "마나: " << mp << endl;
-    cout << "공격력: " << attack << endl;
-    cout << "경험치: " << exp << " / " << max_EXP << endl;
-    cout << "골드: " << gold << endl;
-    cout << "======================" << endl;
+    ConsoleUI::PrintTitle("캐릭터 상태");
+    
+    std::vector<std::string> lines;
+    lines.push_back("이름: " + name);
+    lines.push_back("레벨: " + std::to_string(level));
+    lines.push_back("HP: " + std::to_string(hp) + " / " + std::to_string(maxHP));
+    lines.push_back("MP: " + std::to_string(mp));
+    lines.push_back("공격력: " + std::to_string(attack));
+    lines.push_back("EXP: " + std::to_string(exp) + " / " + std::to_string(max_EXP));
+    lines.push_back("Gold: " + std::to_string(gold));
+    
+    
+    ConsoleUI::PrintBox(lines);
 }
 
 void PlayerCharacter::TakeDamage(int damage)
@@ -34,6 +39,9 @@ void PlayerCharacter::TakeDamage(int damage)
 
     if (IsDead())
         cout << "으앙 쥬금... (x_x)" << endl;
+    
+    logManager.Add(LogHeader::Info, "PlayerDead", "IsDead" + to_string(IsDead()));
+    
 }
 
 void PlayerCharacter::GainEXP(int amount)
@@ -51,18 +59,32 @@ void PlayerCharacter::GainEXP(int amount)
 void PlayerCharacter::GainGold(int amount)
 {
     if (amount <= 0)
+    {
+        logManager.Add(LogHeader::Error, "WrongGold", amount);
         return;
+    }
 
+    logManager.Add(LogHeader::Info, "GainGold:", amount);
     gold += amount;
+    
+    logManager.Add(LogHeader::Info, "RemainGold:", name + " : " + to_string(GetGold()));
 }
 
 void PlayerCharacter::BuyItem(int amount, std::unique_ptr<Item> item)
 {
-    if (amount <= 0 || !IsCanBuy(amount))
+    if (amount <= 0 || !IsCanBuy(amount) || item == nullptr)
+    {
+        logManager.Add(LogHeader::Error, "Insufficient Balance", 
+            "Item : " + to_string(amount) + " RemainGold : " + to_string(GetGold()) ) ;
         return;
+    }
+
+    const std::string itemName = item->getName();
     
     AddItem(std::move(item));
+    logManager.Add(LogHeader::Info, "BuyItem:", itemName);
     gold -= amount;
+    logManager.Add(LogHeader::Info, "RemainGold:", name + " : " + to_string(GetGold()));
 }
 
 void PlayerCharacter::Heal(int amount)
@@ -88,13 +110,24 @@ void PlayerCharacter::AddItem(std::unique_ptr<Item> item)
     if (item == nullptr)
         return;
 
+    const std::string itemName = item->getName();
     inventory.push_back(std::move(item));
+    logManager.Add(LogHeader::Info, "AddItem:", itemName);
 }
 
 void PlayerCharacter::ShowInventory() const
 {
     for (size_t i = 0; i < inventory.size(); i++)
         cout << i << ". " << inventory[i]->getName() << endl;
+}
+
+void PlayerCharacter::ShowItemInspector(int index) const
+{
+    if (index < 0 || index >= static_cast<int>(inventory.size()))
+        return;
+
+    cout << inventory[index]->getName() << endl;
+    cout << inventory[index]->getPrice() << endl;
 }
 
 void PlayerCharacter::UseItem(int index)
@@ -104,6 +137,8 @@ void PlayerCharacter::UseItem(int index)
     
     inventory[index]->use(this);
     
+    logManager.Add(LogHeader::Info, "UseItem:", inventory[index]->getName());
+    
     inventory.erase(inventory.begin() + index);
 }
 
@@ -112,10 +147,22 @@ void PlayerCharacter::SellItem(int index)
     if (index < 0 || index >= static_cast<int>(inventory.size()))
         return;
     
-    GainGold(inventory[index]->getPrice());
+    int sellPrice = static_cast<int>(inventory[index]->getPrice() * 0.6f);
+    
+    GainGold(sellPrice);
+    
+    logManager.Add(LogHeader::Info, "SellItem:", sellPrice);
+    logManager.Add(LogHeader::Info, "RemainGold:", name + " : " + to_string(GetGold()));
+    
+    
     
     inventory.erase(inventory.begin() + index);
+    
+    
+    cout << "  [" << name << "] sold! (+" << sellPrice << "G)\n";
+    cout << "  Gold remaining: " << GetGold() << "G\n";
 }
+
 
 void PlayerCharacter::CreateCharacter()
 {
@@ -124,17 +171,18 @@ void PlayerCharacter::CreateCharacter()
     mp = 100;
     exp = 0;
     attack = 30;
-    level = 1;
+    level = 10;
     gold = 0;
     max_EXP = 100;
 
     skills.clear();
     
+    logManager.Add(LogHeader::Info, "CreateCharacter:", name);
     //예시 skills.emplace_back("존나 개쌔게 내려찎기", 10, 20, SkillType::Attack);        
 }
 
 void PlayerCharacter::ShowSkills() const
-{   //아직 logmng가 덜 구현되어 있어서 일단 적용 안함
+{   
     cout << "===== 스킬 목록 =====" << endl;
     for (size_t i = 0; i < skills.size(); i++)
     {
@@ -180,6 +228,7 @@ const std::string& PlayerCharacter::GetName() const
 int PlayerCharacter::GetLevel() const
 {
     return level;
+    
 }
 
 int PlayerCharacter::GetHP() const

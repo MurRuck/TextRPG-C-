@@ -3,6 +3,15 @@
 #include <filesystem>
 #include <iostream>
 
+std::string LoggingManager::currentLogFilePath;
+std::ofstream LoggingManager::logFile;
+bool LoggingManager::initialized = false;
+
+#ifdef _WIN32
+HANDLE LoggingManager::logPipeWrite = nullptr;
+PROCESS_INFORMATION LoggingManager::logProcessInfo{};
+#endif
+
 LoggingManager::LoggingManager()
 {
     Initialize();
@@ -10,34 +19,15 @@ LoggingManager::LoggingManager()
 
 LoggingManager::~LoggingManager()
 {
-    if (logFile.is_open())
-    {
-        logFile.close();
-    }
-
-#ifdef _WIN32
-    if (logPipeWrite)
-    {
-        CloseHandle(logPipeWrite);
-        logPipeWrite = nullptr;
-    }
-
-    if (logProcessInfo.hProcess)
-    {
-        CloseHandle(logProcessInfo.hProcess);
-        logProcessInfo.hProcess = nullptr;
-    }
-
-    if (logProcessInfo.hThread)
-    {
-        CloseHandle(logProcessInfo.hThread);
-        logProcessInfo.hThread = nullptr;
-    }
-#endif
 }
 
 bool LoggingManager::Initialize(const std::string& logDirectory)
 {
+    if (initialized && logFile.is_open())
+    {
+        return true;
+    }
+
     namespace fs = std::filesystem;
 
     if (!fs::exists(logDirectory))
@@ -50,13 +40,19 @@ bool LoggingManager::Initialize(const std::string& logDirectory)
 
     logFile.open(currentLogFilePath);
     InitializeLogConsole();
+    initialized = logFile.is_open();
 
-    return logFile.is_open();
+    return initialized;
 }
 
 bool LoggingManager::InitializeLogConsole()
 {
 #ifdef _WIN32
+    if (logPipeWrite != nullptr)
+    {
+        return true;
+    }
+
     SECURITY_ATTRIBUTES securityAttributes{};
     securityAttributes.nLength = sizeof(SECURITY_ATTRIBUTES);
     securityAttributes.bInheritHandle = TRUE;

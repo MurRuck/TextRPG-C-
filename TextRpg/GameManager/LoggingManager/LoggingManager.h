@@ -52,15 +52,16 @@ public:
 
     
 private:
-    std::string currentLogFilePath;
-    std::ofstream logFile;
+    static std::string currentLogFilePath;
+    static std::ofstream logFile;
+    static bool initialized;
     
     std::string GetTimestamp() const;
-    bool InitializeLogConsole();
-    void WriteToLogConsole(const std::string& line);
+    static bool InitializeLogConsole();
+    static void WriteToLogConsole(const std::string& line);
     
 #ifdef _WIN32
-    HANDLE logPipeWrite = nullptr;
-    PROCESS_INFORMATION logProcessInfo{};
+    static HANDLE logPipeWrite;
+    static PROCESS_INFORMATION logProcessInfo;
 #endif
 };

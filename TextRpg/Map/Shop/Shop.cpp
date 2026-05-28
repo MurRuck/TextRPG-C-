@@ -1,263 +1,324 @@
-﻿#include "Shop.h"
+#include "Shop.h"
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <limits>
+#include <string>
+#include <windows.h>
+#include <mmsystem.h>
+
 #include "../../Entity/Character/PlayerCharacter.h"
 #include "../../GameManager/LoggingManager/LoggingManager.h"
-#include "../../Item/HealthPotion.h"
 #include "../../Item/AttackBoost.h"
+#include "../../Item/HealthPotion.h"
+#include "../../UI/AsciiArt.h"
+#include "../../UI/ConsoleUI.h"
 
+#pragma comment(lib, "winmm.lib")
 
-static void ClearInput()
+namespace
 {
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    void ClearInput()
+    {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+
+    void WaitEnter()
+    {
+        std::cout << "\n계속하려면 Enter를 누르세요...";
+        std::cin.get();
+    }
+
+    bool Confirm(const std::string& message)
+    {
+        while (true)
+        {
+            std::cout << message << " (y/n): ";
+
+            char choice;
+            if (!(std::cin >> choice))
+            {
+                ClearInput();
+                continue;
+            }
+            ClearInput();
+
+            if (choice == 'y' || choice == 'Y')
+            {
+                return true;
+            }
+
+            if (choice == 'n' || choice == 'N')
+            {
+                return false;
+            }
+
+            std::cout << "y 또는 n을 입력해주세요.\n";
+        }
+    }
+
+    void PlayPurchaseSound()
+    {
+        const char* soundPaths[] = {
+            "SpekyJoayo.WAV",
+            "spekyjoayo.wav",
+            "..\\..\\SpekyJoayo.WAV",
+            "..\\..\\spekyjoayo.wav",
+            "TextRpg\\SpekyJoayo.WAV",
+            "TextRpg\\spekyjoayo.wav"
+        };
+
+        for (const char* path : soundPaths)
+        {
+            if (PlaySoundA(path, nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT))
+            {
+                return;
+            }
+        }
+    }
 }
 
-static int CalcSellPrice(int basePrice)
-{
-	return static_cast<int>(basePrice * 0.6f); //원가60%로 판매
-}
-
-// ────────────────────────────────────────────
-//  생성자: 재고 등록
-// ────────────────────────────────────────────
 Shop::Shop()
 {
     logManager.Initialize();
 
     stock_.push_back({ []() { return std::make_unique<HealthPotion>(); }, 5 });
-    stock_.push_back({ []() { return std::make_unique<AttackBoost>();  }, 5 });
+    stock_.push_back({ []() { return std::make_unique<AttackBoost>(); }, 5 });
 }
 
-// ────────────────────────────────────────────
-//  전투 후 상점 입장 여부 질문
-// ────────────────────────────────────────────
 void Shop::AskEnterShop(Gamemode& gamemode)
 {
-    char choice;
-    while (true)
+    if (Confirm("상점에 입장하시겠습니까?"))
     {
-        std::cout << "Would you like to enter the shop? (y/n): ";
-        std::cin >> choice;
-        ClearInput();
-
-        if (choice == 'y' || choice == 'Y')
-        {
-            gamemode.SetPlayerState(PlayerState::Shop);
-			ShopMain(&gamemode.GetPlayerCharacter());
-            return;
-        }
-        if (choice == 'n' || choice == 'N')
-        {
-            return;
-        }
-        std::cout << "Please enter y or n.\n";
+        gamemode.SetPlayerState(PlayerState::Shop);
+        OpenShop(gamemode);
     }
 }
 
-// ────────────────────────────────────────────
-//  상점 창 출력
-// ────────────────────────────────────────────
 void Shop::ShopMain(const PlayerCharacter* player) const
 {
-	std::cout << "=====================================\n";
-    std::cout << "            *  S H O P  *            \n";
-    std::cout << "=====================================\n";
-   
-    std::cout << "  1. Buy Item\n";
-    std::cout << "  2. Sell Item\n";
-    std::cout << "  3. Leave Shop\n";
-    std::cout << "\n  Choice: ";
+    ConsoleUI::Clear();
+    AsciiArt::Print(ArtType::Shop);
+    ConsoleUI::PrintTitle("상점");
+
+    if (player != nullptr)
+    {
+        std::cout << "보유 골드: " << player->GetGold() << "G\n\n";
+    }
+
+    std::cout << "1. 아이템 사기\n";
+    std::cout << "2. 아이템 팔기\n";
+    std::cout << "0. 나가기\n";
+    std::cout << "\n선택 > ";
 }
 
-// ────────────────────────────────────────────
-//  구매 처리
-// ────────────────────────────────────────────
 void Shop::BuyItemInShop(int index, Gamemode& gamemode)
 {
     PlayerCharacter* player = gamemode.GetMutablePlayer();
-    if (!player) return;
+    ConsoleUI::Clear();
+    if (player == nullptr)
+    {
+        return;
+    }
+
+    if (index < 0 || index >= static_cast<int>(stock_.size()))
+    {
+        std::cout << "없는 아이템 번호입니다.\n";
+        return;
+    }
 
     ShopEntry& entry = stock_[index];
-    auto itemPtr = entry.factory();         // 구매할 아이템 생성
-    int price = itemPtr->getPrice();
-    std::string itemName = itemPtr->getName();
+    auto item = entry.factory();
+    const int price = item->getPrice();
+    const std::string itemName = item->getName();
 
-    // 현재 골드/재고 리스트 출력
-    std::cout << "  Gold: " << player->GetGold() << "G\n";
-    for (int i = 0; i < (int)stock_.size(); ++i)
-    {
-        auto tmp = stock_[i].factory();
-        std::cout << "  " << (i + 1) << ". "
-            << std::left << std::setw(16) << tmp->getName()
-            << std::setw(6) << (std::to_string(tmp->getPrice()) + "G");
-
-        if (stock_[i].stock > 0) std::cout << stock_[i].stock << "/5\n";
-        else                     std::cout << "  SOLD OUT\n";
-    }
-
-    // 품절 체크
     if (entry.stock <= 0)
     {
-        std::cout << "  " << itemName << " is sold out.\n";
+        std::cout << itemName << "은(는) 품절입니다.\n";
         return;
     }
 
-    // 골드 부족 체크 (player->GetGold()는 public getter)
     if (player->GetGold() < price)
     {
-        std::cout << "  Not enough gold!\n";
+        AsciiArt::Print(ArtType::NotEnoughGold);
+        std::cout << "골드가 부족합니다. 필요 골드: " << price << "G\n";
         return;
     }
 
-    player->BuyItem(price, std::move(itemPtr));   
+    player->BuyItem(price, std::move(item));
     entry.stock--;
 
+    AsciiArt::Print(ArtType::PurchaseSuccess);
+    PlayPurchaseSound();
     logManager.Add(LogHeader::Info, "BuyItem:", itemName + " (-" + std::to_string(price) + "G)");
-
-    std::cout << "  [" << itemName << "] purchased! (-" << price << "G)\n";
-    std::cout << "  Gold remaining: " << player->GetGold() << "G\n";
+    std::cout << itemName << " 구매 완료! 남은 골드: " << player->GetGold() << "G\n";
 }
 
-// ────────────────────────────────────────────
-//  판매 목록 출력
-//-───────────────────────────────────────────
 void Shop::PrintInventoryForSell(const PlayerCharacter* player) const
 {
-    std::cout << "  Gold: " << player->GetGold() << "G\n";
+    if (player == nullptr)
+    {
+        return;
+    }
+
+    std::cout << "보유 골드: " << player->GetGold() << "G\n\n";
+    std::cout << "인벤토리 목록\n";
     player->ShowInventory();
-            
-    std::cout << "  0. Back\n";
-    std::cout << "  Choice: ";
+    std::cout << "\n판매할 인벤토리 번호를 입력하세요. (-1: 뒤로가기)\n";
+    std::cout << "선택 > ";
 }
 
-// ────────────────────────────────────────────
-//  판매 처리
-//-───────────────────────────────────────────
 void Shop::SellItemInShop(int invIndex, Gamemode& gamemode)
 {
     PlayerCharacter* player = gamemode.GetMutablePlayer();
-    if (!player) return;
-      
+    if (player == nullptr)
+    {
+        return;
+    }
+
     player->SellItem(invIndex);
-
-    std::cout << "  Gold remaining: " << player->GetGold() << "G\n";
-
+    std::cout << "현재 골드: " << player->GetGold() << "G\n";
 }
 
-// ────────────────────────────────────────────
-//  판매 루프
-//  0 입력 시 상점 메뉴로 복귀
-//-───────────────────────────────────────────
 void Shop::OpenSellMenu(Gamemode& gamemode)
 {
+    PlayerCharacter* player = gamemode.GetMutablePlayer();
+    if (player == nullptr)
+    {
+        return;
+    }
+
     while (true)
     {
-        std::cout << "=====================================\n";
-        std::cout << "            *  S E L L  *            \n";
-        std::cout << "=====================================\n";
-        PlayerCharacter* player = gamemode.GetMutablePlayer();
+        ConsoleUI::Clear();
+        AsciiArt::Print(ArtType::Shop);
+        ConsoleUI::PrintTitle("아이템 팔기");
         PrintInventoryForSell(player);
 
         int input;
         if (!(std::cin >> input))
         {
             ClearInput();
-            std::cout << "  Please enter a number.\n";
+            std::cout << "숫자를 입력해주세요.\n";
+            WaitEnter();
             continue;
         }
         ClearInput();
 
-        if (input == 0)
+        if (input == -1)
+        {
             return;
+        }
 
-        int invIndex = input - 1;
-        SellItemInShop(invIndex, gamemode);
+        if (!Confirm("선택한 아이템을 판매하시겠습니까?"))
+        {
+            return;
+        }
+
+        SellItemInShop(input, gamemode);
+        WaitEnter();
     }
 }
 
-// ────────────────────────────────────────────
-//  구매 루프
-// -───────────────────────────────────────────
 void Shop::OpenBuyMenu(Gamemode& gamemode)
 {
+    PlayerCharacter* player = gamemode.GetMutablePlayer();
+    if (player == nullptr)
+    {
+        return;
+    }
+
     while (true)
     {
-        std::cout << "=====================================\n";
-        std::cout << "            *  S H O P  *            \n";
-        std::cout << "=====================================\n";
-        std::cout << "1. HealthPotion: Restores 50 HP. (50G)\n";
-        std::cout << "2. AttackBoost: Increases attack by 10 for the next battle. (10G)\n";
-        std::cout << "0. Back\n";
-        PlayerCharacter* player = gamemode.GetMutablePlayer();
+        ConsoleUI::Clear();
+        AsciiArt::Print(ArtType::Shop);
+        ConsoleUI::PrintTitle("아이템 사기");
+
+        std::cout << "보유 골드: " << player->GetGold() << "G\n\n";
+        for (int i = 0; i < static_cast<int>(stock_.size()); ++i)
+        {
+            auto item = stock_[i].factory();
+            std::cout << i + 1 << ". "
+                << std::left << std::setw(16) << item->getName()
+                << std::right << std::setw(5) << item->getPrice() << "G"
+                << " / 재고: " << stock_[i].stock << "\n";
+        }
+
+        std::cout << "0. 뒤로가기\n\n";
+        std::cout << "구매할 아이템 번호 입력 > ";
+
         int input;
         if (!(std::cin >> input))
         {
             ClearInput();
-            std::cout << "  Please enter a number.\n";
+            std::cout << "숫자를 입력해주세요.\n";
+            WaitEnter();
             continue;
         }
         ClearInput();
+
         if (input == 0)
-            return;
-        int index = input - 1;
-        if (index < 0 || index >= (int)stock_.size())
         {
-            std::cout << "  Invalid number.\n";
+            return;
+        }
+
+        const int index = input - 1;
+        if (index < 0 || index >= static_cast<int>(stock_.size()))
+        {
+            std::cout << "없는 아이템 번호입니다.\n";
+            WaitEnter();
             continue;
         }
-        BuyItemInShop(index, gamemode);
-	}
 
+        auto item = stock_[index].factory();
+        const std::string itemName = item->getName();
+        const int price = item->getPrice();
+
+        if (!Confirm(itemName + "을(를) " + std::to_string(price) + "G에 구매하시겠습니까?"))
+        {
+            return;
+        }
+
+        BuyItemInShop(index, gamemode);
+        WaitEnter();
+    }
 }
 
-
-// ────────────────────────────────────────────
-//  상점  루프
-//  3 입력 시 Battle 상태로 복귀
-// ────────────────────────────────────────────
 void Shop::OpenShop(Gamemode& gamemode)
 {
     while (true)
     {
-        ShopMain(&gamemode.GetPlayerCharacter());
+        ShopMain(gamemode.GetMutablePlayer());
 
         int input;
         if (!(std::cin >> input))
         {
             ClearInput();
-            std::cout << "  Please enter a number.\n";
+            std::cout << "숫자를 입력해주세요.\n";
+            WaitEnter();
             continue;
         }
         ClearInput();
-        
+
         if (input == 1)
         {
-            OpenBuyMenu(gamemode); //구매 화면
-            continue;
+            OpenBuyMenu(gamemode);
         }
-
-        if (input == 2)
+        else if (input == 2)
         {
-            OpenSellMenu(gamemode); //판매 화면
-            continue;
+            OpenSellMenu(gamemode);
         }
-
-        if (input == 3) // 상점 나가기
+        else if (input == 0)
         {
-            gamemode.SetPlayerState(PlayerState::Battle);
-            std::cout << "  Leaving the shop. Safe travels!\n";
+            std::cout << "상점에서 나갑니다.\n";
+            WaitEnter();
             return;
         }
-        int index = input - 1; // 1-based → 0-based
-        if (index < 0 || index >= (int)stock_.size())
+        else
         {
-            std::cout << "  Invalid number.\n";
-            continue;
+            std::cout << "없는 메뉴입니다.\n";
+            WaitEnter();
         }
-
-       
     }
 }

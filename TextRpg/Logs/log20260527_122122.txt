@@ -1,7 +1,0 @@
-[Info] Battle StartPlayer entered battle
-[Info] Monster SpawnSlime
-[Warning] Buff UsedAttack +10 for 3 turns
-[Warning] Monster Attack9
-[Info] Player Attack40
-[Info] RewardEXP & Gold granted
-[Info] Battle EndBattle finished
