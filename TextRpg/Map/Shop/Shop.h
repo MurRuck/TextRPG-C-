@@ -23,7 +23,7 @@ class Shop
 public:
     Shop(Gamemode* gamemode_ptr = nullptr);
         
-    void AskEnterShop();
+    
     void OpenShop();
 
 private:

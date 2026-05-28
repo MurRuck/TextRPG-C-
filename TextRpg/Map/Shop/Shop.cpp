@@ -85,14 +85,7 @@ Shop::Shop(Gamemode* gamemode_ptr) : gamemode(gamemode_ptr)
     stock_.push_back({ []() { return std::make_unique<AttackBoost>(); }, 5 });
 }
 
-void Shop::AskEnterShop()
-{
-    if (Confirm("상점에 입장하시겠습니까?"))
-    {
-        gamemode->SetPlayerState(PlayerState::Shop);
-        OpenShop();
-    }
-}
+
 
 void Shop::ShopMain(const PlayerCharacter* player) const
 {
@@ -149,8 +142,7 @@ void Shop::BuyItemInShop(int index)
 
     AsciiArt::Print(ArtType::PurchaseSuccess);
     PlayPurchaseSound();
-    gamemode->GetLogger()->Add(LogHeader::System, "Player : ","Buy "+ itemName + " (-" + std::to_string(price) + "G)");
-    gamemode->GetLogger()->Add(LogHeader::Info, "Player : ", "Remain Gold " + player->GetGold());
+    
 }
 
 void Shop::PrintInventoryForSell(const PlayerCharacter* player) const
@@ -182,8 +174,7 @@ void Shop::SellItemInShop(int invIndex)
     const int price = item->getPrice();
     const std::string itemName = item->getName();
     
-    gamemode->GetLogger()->Add(LogHeader::System, "Player : ","Sell "+ itemName + " (+" + std::to_string(price) + "G)");
-    gamemode->GetLogger()->Add(LogHeader::Info, "Player : ", "Remain Gold " + player->GetGold());
+    
     
 }
 
