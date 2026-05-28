@@ -6,7 +6,7 @@
 #include <windows.h>
 #include "../../GameManager/Gamemode/Gamemode.h"
 #include "../../UI/AsciiArt.h"
-
+#include "../../Entity/Enemy/Boss.h"
 
 using namespace std;
 
@@ -192,14 +192,13 @@ void BattleLoop::CreateMonster()
    
     level = std::max(1, level);
 
-    monster = std::make_unique<EnemyBase>(name, level, 1.0f);
+    if (name == "Boss")
+        monster = std::make_unique<Boss>(name, level);
+    else
+        monster = std::make_unique<EnemyBase>(name, level, 1.0f);
 
     PushLog(name + " 등장!");
     DisplayUI();
-
-    gamemode.GetLogger()->Add(LogHeader::System,
-        "Monster Spawned : ",
-        monster->GetName());
 }
 
 // =========================
